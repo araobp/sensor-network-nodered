@@ -2,7 +2,7 @@
 
 ## Background and motivation
 
-I want to use Node-RED to control my hardware prototype in some cases.
+I want to use Node-RED to control my hardware prototype (such as [this one](https://github.com/araobp/sensor-network)) in some cases.
 
 ## Flow
 
