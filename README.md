@@ -39,4 +39,4 @@ Sensor 17     MCU          vWire common     vWire instance
 
 I have devised two approached:
 - Use "tcp node" on Node-RED and develop a TCP server as vWire common
-- Develop a new node for Node-RED.
+- Develop a new node for Node-RED, using "serialport" package.
