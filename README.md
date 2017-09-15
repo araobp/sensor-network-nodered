@@ -7,9 +7,13 @@ I want to use Node-RED to control my hardware prototype (such as [this one](http
 ## Flow
 
 [Step 1] The user of vWire node sets a source ID(its own ID) to the instance of vWire.
+
 [Step 2] The vWire instance appends the number to a request message to MCU.
+
 [Step 3] vWire common part transfers the message to MCU.
+
 [Step 4] vWire common part receives a response from MCU and transfers it to the instance of vWire.
+
 ```
 
 Sensor 17     MCU          vWire common     vWire instance
