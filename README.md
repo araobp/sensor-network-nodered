@@ -8,7 +8,7 @@ Lately I have been creating miniature things that can be controlled by Node-RED,
 
 Once I tested SONY Koov that has a Scratch-like programming tool, and the programming style is completely synchronous. I also watched a TV program teaching Scatch to kids.
 
-The goal of this project is to see if it is possible to create synchronous and coarse-grained nodes on Node-RED to control my miniature things. Some of them use [this sensor network](https://github.com/araobp/sensor-network)).
+The goal of this project is to see if it is possible to create synchronous and coarse-grained nodes on Node-RED to control my miniature things. Some of them use [this sensor network](https://github.com/araobp/sensor-network).
 
 ## Flow
 
