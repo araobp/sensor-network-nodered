@@ -2,7 +2,13 @@
 
 ## Background and motivation
 
-I want to use Node-RED to control my hardware prototype (such as [this one](https://github.com/araobp/sensor-network)) in some cases.
+Generally speaking, the granurarity of nodes on Node-RED is fine-grained (KISS), and some of them are asynchronous (event-driven).
+
+Lately I have been creating miniature things that can be controlled by Node-RED, as educational materials. However, I have been wondering if children younger than 8 years old can really program Node-RED to control them.
+
+Once I tested SONY Koov that has a Scratch-like programming tool, and the programming style is completely synchronous. I also watched a TV program teaching Scatch to kids.
+
+The goal of this project is to see if it is possible to create synchronous and coarse-grained nodes on Node-RED to control my miniature things. Some of them use [this sensor network](https://github.com/araobp/sensor-network)).
 
 ## Flow
 
