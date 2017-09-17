@@ -1,9 +1,23 @@
 <script type="text/javascript">
-    RED.nodes.registerType('vwire',{
-        category: 'function',
-        color: '#9AFE2E',
+    RED.nodes.registerType('vwire-config',{
+        category: 'config',
         defaults: {
-            name: {value:""}
+            port: {value:"/dev/ttyUSB0", required:true},
+            baudrate: {value:115200, required:true, validate:RED.validators.number()}
+        },
+        label: function() {
+            return this.port + '@' + this.baudrate;
+        }
+    });
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('vwire', {
+        category: 'function',
+        color: "#9AFE2E",
+        defaults: {
+            name: {value:""},
+            params: {value:"", type:"vwire-config"}
         },
         inputs:1,
         outputs:1,
@@ -14,10 +28,24 @@
     });
 </script>
 
+<script type="text/x-red" data-template-name="vwire-config">
+    <div class="form-row">
+        <label for="node-config-input-port"><i class="icon-tag"></i> Port</label>
+        <input type="text" id="node-config-input-port" placeholder="Port">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-baudrate"><i class="icon-tag"></i> Baudrate</label>
+        <input type="text" id="node-config-input-baudrate" placeholder="Baudrate">
+    </div>
+</script>
+
 <script type="text/x-red" data-template-name="vwire">
     <div class="form-row">
         <label for="node-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row"> <label for="node-input-params"><i class="icon-tag"></i> Serial Port</label>
+        <input type="text" id="node-input-params" placeholder="Serial Port">
     </div>
 </script>
 

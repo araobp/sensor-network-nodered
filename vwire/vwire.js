@@ -10,10 +10,24 @@ module.exports = function(RED) {
     var transactions = {};
     var buf = []; 
 
-    function getPort() {
+    function VwireConfig(n) {
+        //console.log(n);
+        RED.nodes.createNode(this, n);
+        this.port = n.port;
+        this.baudrate = n.baudrate;
+        this.on('close', function(removed, done) {
+            transactions = {};
+            port.close();
+            port = null;
+            done();
+        });
+    }
+    RED.nodes.registerType("vwire-config", VwireConfig);
+
+    function getPort(params) {
         if (port == null) { 
-            port = new SerialPort('/dev/ttyUSB0', {
-            baudRate: 115200,
+            port = new SerialPort(params.port, {
+            baudRate: parseInt(params.baudrate),
             parser: SerialPort.parsers.raw,
             autoOpen: true 
             });
@@ -48,16 +62,17 @@ module.exports = function(RED) {
         RED.nodes.createNode(this, config);
         var node = this;
         var id = config.id;
-        //console.log(id);
-        var port = getPort();
+        //console.log(config);
+        var params = RED.nodes.getNode(config.params);
         node.on('input', function(msg) {
             var command = msg.payload;
+            //console.log(command);
             transactions[command] = this;
             //console.log(transactions);
-            port.write(msg.payload + '\n');
+            getPort(params).write(command + '\n');
         });
         node.on('close', function(removed, done) {
-            transaction = {};
+            transactions = {};
             done();
         });
     }
