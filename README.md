@@ -51,4 +51,4 @@ Assuming that this repo is under /home/pi, modify ~/.node-red/settings.js as fol
 nodesDir: '/home/pi/sensor-network-nodered/vwire',
 ```
 
-I have just made a minimum implementation.
+I have just made [a minimal implementation](./vwire).
