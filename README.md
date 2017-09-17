@@ -1,6 +1,6 @@
 # sensor-network-nodered
 
-![nodered](./doc/flow.png)
+![vwire](./doc/vwire.png)
 
 ## Background and motivation
 
@@ -33,7 +33,7 @@ Sensor B       |                |           vWire node 2                :
    |           |    req2        |<---------------|                      | in
    |           |<---uart/usb----|                |                      V
    |<---i2c----|                |                |               [vwire node 2]
-   |----i2c--->|    res2        |                |                      | 
+   |----i2c--->|    res2        |                |                      |
    |           |----uart/usb--->|    res2        |                      |
    |           |                |--------------->|                      V out
 
@@ -51,4 +51,9 @@ Assuming that this repo is under /home/pi, modify ~/.node-red/settings.js as fol
 nodesDir: '/home/pi/sensor-network-nodered/vwire',
 ```
 
-I have just made [a minimal implementation](./vwire).
+I have just made [a minimal implementation](./vwire):
+- vwire: control/manage the sensor network in a sequential manner.
+- vwire-in: receives time-series sensor data from the sensor network.
+- vwire-config: config shared by vwire and vwire-in instances.
+
+![nodered](./doc/flow.png)
