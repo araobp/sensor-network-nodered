@@ -12,33 +12,34 @@ The goal of this project is to see if it is possible to create synchronous and c
 
 ## Flow
 
-[Step 1] The user of vWire node sets a source ID(its own ID) to the instance of vWire.
+[Step 1] The vwire common part appends a sequence number (uint8_t) corresponding to the vwire instance's id to a request message to MCU.
 
-[Step 2] The vWire instance appends the number to a request message to MCU.
-
-[Step 3] vWire common part transfers the message to MCU.
-
-[Step 4] vWire common part receives a response from MCU and transfers it to the instance of vWire.
+[Step 2] vwire common part receives a response from MCU and transfers it to the instance.
 
 ```
 
-Sensor 17     MCU          vWire common     vWire instance
+Sensor 17     MCU          vWire common     vWire instance (id1)
    |           |                |    req1,id1    |
-   |           |    req1,id1    |<---------------|
+   |           |    req1,5      |<---------------|
    |           |<---------------|                |
-   |---------->|    res1,id1    |                |
+   |---------->|    res1,5      |                |
    |           |--------------->|    res1,id1    |
    |           |                |--------------->|
    |           |
-   |           |           vWire common    vWire instance
+   |           |           vWire common    vWire instance (id2)
    |           |                |                |
    |           |                |    req2,id2    |
-   |           |    req2,id2    |<---------------|
+   |           |    req2,6      |<---------------|
    |           |<---------------|                |
-   |---------->|    res2,id2    |                |
+   |---------->|    res2,6      |                |
    |           |--------------->|    res2,id2    |
    |           |                |--------------->|
    
+   Sequence number:
+   5 <-> id1
+   6 <-> id2
+       :
+       
 ```
 
 ## Implementation
