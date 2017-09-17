@@ -12,7 +12,7 @@ Once I tested [SONY Koov](https://www.sony.com/koov) that has a Scratch-like pro
 
 The goal of this project is to see if it is possible to create synchronous and coarse-grained nodes on Node-RED to control my miniature things in a sequence-control manner. Some of them use [this sensor network protocol](https://github.com/araobp/sensor-network).
 
-## Flow
+## Sequence
 
 ```
 
