@@ -37,17 +37,29 @@ module.exports = function(RED) {
                         var dataString = new Buffer(buf).toString('utf8');
                         buf.length = 0;
                         //console.log(dataString);
-                        if (dataString.substring(0,1) != '#') {
-                            var resp = dataString.split(':');
-                            var command = resp[1];
-                            //console.log(msg);
-                            if (command in transactions) {
-                                var msg = {payload: resp[2]};
-                                var dest = transactions[command];
-                                //console.log(dest);
-                                delete transactions[command];
-                                dest.send(msg);
-                            }
+                        var startsWith = dataString.substring(0,1);
+                        switch(startsWith) {
+                            case '$':
+                                var resp = dataString.split(':');
+                                var command = resp[1];
+                                //console.log(msg);
+                                if (command in transactions) {
+                                    var msg = {payload: resp[2]};
+                                    var dest = transactions[command];
+                                    //console.log(dest);
+                                    delete transactions[command];
+                                    dest.send(msg);
+                                }
+                                break;
+                            case '%':
+                                var resp = dataString.split(':');
+                                var msg = {payload: resp};
+                                if ('_in' in transactions) {
+                                    transactions._in.send(msg);
+                                }
+                                break;
+                            default:
+                                break;
                         }
                     } else {
                         buf.push(c);
@@ -61,15 +73,28 @@ module.exports = function(RED) {
     function Vwire(config) {
         RED.nodes.createNode(this, config);
         var node = this;
-        var id = config.id;
         //console.log(config);
         var params = RED.nodes.getNode(config.params);
+        var command = null;
+        if (config.name != '') {
+            command = config.name;
+        }
+        var noack = config.noack;
+        var port = getPort(params); 
         node.on('input', function(msg) {
-            var command = msg.payload;
+            var cmd = null;
+            if (command) {
+                cmd = command;
+            } else {
+                cmd = msg.payload;
+            }
             //console.log(command);
-            transactions[command] = this;
+            transactions[cmd] = this;
             //console.log(transactions);
-            getPort(params).write(command + '\n');
+            port.write(cmd + '\n');
+            if (noack) {
+                node.send({payload: null});
+            }
         });
         node.on('close', function(removed, done) {
             transactions = {};
@@ -77,4 +102,15 @@ module.exports = function(RED) {
         });
     }
     RED.nodes.registerType("vwire", Vwire);
+
+    function VwireIn(config) {
+        RED.nodes.createNode(this, config);
+        var node = this;
+        transactions['_in'] = this;
+        node.on('close', function(removed, done) {
+            transactions = {};
+            done();
+        });
+    }
+    RED.nodes.registerType("vwire-in", VwireIn);
 }
