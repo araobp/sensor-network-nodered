@@ -16,22 +16,30 @@ The goal of this project is to see if it is possible to create synchronous and c
 
 ```
 
-Sensors       MCU          vWire common     vWire instance (id1)
-   |           |                |    req1        |
-   |           |    req1        |<---------------|
-   |           |<---------------|                |
-   |---------->|    res1        |                |
-   |           |--------------->|    res1        |
-   |           |                |--------------->|
-               |
-               |           vWire common    vWire instance (id2)
-   |           |                |                |
-   |           |                |    req2        |
-   |           |    req2        |<---------------|
-   |           |<---------------|                |
-   |---------->|    res2        |                |
-   |           |--------------->|    res2        |
-   |           |                |--------------->|
+  <--- virtual wire (vwire) --------------------->                Node-RED flow
+                                                                        |
+Sensor A      MCU          vWire common     vWire node 1                |
+   |           |                |    req1        |                      |
+   |           |    req1        |<---------------|                      | in
+   |           |<----uart-------|                |                      V
+   |<---i2c----|                |                |               [vwire node 1]
+   |----i2c--->|    res1        |                |                      |
+   |           |-----uart------>|    res1        |                      |
+   |           |                |--------------->|                      | out
+               |                |                                       :
+Sensor B       |                |           vWire node 2                :
+   |           |                |                |                      |
+   |           |                |    req2        |                      |
+   |           |    req2        |<---------------|                      | in
+   |           |<---uart/usb----|                |                      V
+   |<---i2c----|                |                |               [vwire node 2]
+   |----i2c--->|    res2        |                |                      | 
+   |           |----uart/usb--->|    res2        |                      |
+   |           |                |--------------->|                      V out
+
+
+"vwire common" is a instance of serialport attached to a tty (e.g., /dev/ttyUSB0) on Linux
+or a COM port on Windows.
 
 ```
 
