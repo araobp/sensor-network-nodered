@@ -53,7 +53,27 @@ module.exports = function(RED) {
                                 break;
                             case '%':
                                 var resp = dataString.split(':');
-                                var msg = {payload: resp};
+                                var deviceId = parseInt(resp[0].slice(1,3));
+                                var converted = [];
+                                var data = resp[2].split(',');
+                                switch(resp[1]) {
+                                    case 'FLOAT':
+                                        for (var d of data) {
+                                            converted.push(parseFloat(d));
+                                        }
+                                        break;
+                                    default:
+                                        for (var d of data) {
+                                            converted.push(parseInt(d));
+                                        }
+                                        break;
+                                }
+
+                                var msg = {payload: {
+                                    deviceId: deviceId,
+                                    data: converted
+                                }};
+                                    
                                 if ('_in' in transactions) {
                                     transactions._in.send(msg);
                                 }
