@@ -38,7 +38,7 @@ Sensor B       |                |           vWire node 2                :
    |           |                |--------------->|                      V out
 
 
-"vwire common" is a instance of serialport attached to a tty (e.g., /dev/ttyUSB0) on Linux
+"vwire common" is an instance of serialport attached to a tty (e.g., /dev/ttyUSB0) on Linux
 or a COM port on Windows.
 
 ```
