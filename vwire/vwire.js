@@ -7,7 +7,7 @@ module.exports = function(RED) {
     const parsers = SerialPort.parsers;
 
     var port = null;
-    var instances = [];
+    var transactions = {};
     var buf = []; 
 
     function getPort() {
@@ -26,12 +26,13 @@ module.exports = function(RED) {
                         if (dataString.substring(0,1) != '#') {
                             var resp = dataString.split(':');
                             var command = resp[1];
-                            var msg = {payload: resp[2]};
                             //console.log(msg);
-                            for (var n of instances) {
-                                if (n[1] == command) {
-                                    n[0].send(msg);
-                                }
+                            if (command in transactions) {
+                                var msg = {payload: resp[2]};
+                                var dest = transactions[command];
+                                //console.log(dest);
+                                delete transactions[command];
+                                dest.send(msg);
                             }
                         }
                     } else {
@@ -46,14 +47,17 @@ module.exports = function(RED) {
     function Vwire(config) {
         RED.nodes.createNode(this, config);
         var node = this;
-        instances.push([node, config.command]);
+        var id = config.id;
+        //console.log(id);
         var port = getPort();
         node.on('input', function(msg) {
-            var cmd = msg.payload;
-            port.write(config.command + '\n');
+            var command = msg.payload;
+            transactions[command] = this;
+            //console.log(transactions);
+            port.write(msg.payload + '\n');
         });
         node.on('close', function(removed, done) {
-            instances.length = 0;
+            transaction = {};
             done();
         });
     }
