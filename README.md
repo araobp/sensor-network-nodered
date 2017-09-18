@@ -67,6 +67,7 @@ The msg format is as follows:
 msg:
   payload:
     command: <command>
+    result: <result>
     deviceId: <id>
     data: [<d1>, <d2>, ...]
 ```
