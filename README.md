@@ -58,6 +58,8 @@ I have just made [a minimal implementation](./vwire):
 
 ![nodered](./doc/flow.png)
 
+## TODO
+
 ### msg format
 
 Node-RED's msg is used as a transaction block that traverses a Node-RED'S flow through nodes.
@@ -66,8 +68,17 @@ The msg format is as follows:
 ```
 msg:
   payload:
+    state: <state>
     command: <command>
     result: <result>
     deviceId: <id>
     data: [<d1>, <d2>, ...]
 ```
+
+if vwire's name is set, vwire uses the name as msg.payload.command.
+
+### pubsub to the sensor network
+
+vwire-in node supports pubsub to subscribe time-series data from a specific sensor.
+
+The operation is similar to BLE GATT: supports read(to read sensor data)/write(to control actuator)/notify(to notify sensor data).
