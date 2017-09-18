@@ -110,3 +110,7 @@ vwire-in node supports pubsub to subscribe time-series data from a specific sens
 The operation is similar to BLE GATT: supports read(to read sensor data)/write(to control actuator)/notify(to notify sensor data).
 
 Before supporting this feature, this capability needs to be implemented: https://github.com/araobp/sensor-network/issues/1
+
+### BLE interface
+
+A priate BLE GATT service is provied with characteristics corresponding to the read/write/notify operations described in the above.
