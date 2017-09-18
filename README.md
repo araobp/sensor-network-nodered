@@ -114,3 +114,27 @@ Before supporting this feature, this capability needs to be implemented: https:/
 ### BLE interface
 
 A priate BLE GATT service is provied with characteristics corresponding to the read/write/notify operations described in the above.
+
+I am developing a serial communication service between Microchip's RN4020 and Node-RED/Android:
+
+![RN4020](./doc/ble.png)
+
+![Schematic](./doc/ble.jpg)
+
+```
+[Scheduler]--UART--[RN4020] - - BLE - - [Node-RED/Android]
+
+      Service "Sensor Network"
+      +---------------------------+
+      | Characteristics           |
+      | +-----------------------+ |
+<-WV--- |                       | <- Write -
+      | +-----------------------+ |
+      | Characteristics           |
+      | +-----------------------+ |
+-SHU--> |                       | - Read/Notify ->
+      | +-----------------------+ |
+      +---------------------------+
+```
+
+Refer to [the user's guide](http://ww1.microchip.com/downloads/en/DeviceDoc/70005191B.pdf#search=%27RN4020%27).
