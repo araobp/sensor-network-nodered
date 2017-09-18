@@ -9,6 +9,7 @@ module.exports = function(RED) {
     var port = null;
     var transactions = {};
     var buf = []; 
+    var statusIndicators = [];
 
     function VwireConfig(n) {
         //console.log(n);
@@ -26,6 +27,9 @@ module.exports = function(RED) {
 
     function getPort(params) {
         if (port == null) { 
+            for (var s of statusIndicators) {
+                s.status({fill:"red",shape:"dot",text:"disconnected"});
+            }
             port = new SerialPort(params.port, {
             baudRate: parseInt(params.baudrate),
             parser: SerialPort.parsers.raw,
@@ -86,6 +90,17 @@ module.exports = function(RED) {
                     }
                 }
             });
+            port.on('open', function() {
+                for (var s of statusIndicators) {
+                    s.status({fill:"green",shape:"dot",text:"connected"});
+                }
+            });
+            port.on('close', function() {
+                for (var s of statusIndicators) {
+                    port = null;
+                    s.status({fill:"red",shape:"dot",text:"disconnected"});
+                }
+            });
         }
         return port;
     }
@@ -133,4 +148,15 @@ module.exports = function(RED) {
         });
     }
     RED.nodes.registerType("vwire-in", VwireIn);
+
+    function VwireStatus(config) {
+        RED.nodes.createNode(this, config);
+        var node = this;
+        statusIndicators.push(node);
+        node.on('close', function(removed, done) {
+            statusIndicators = {};
+            done();
+        });
+    }
+    RED.nodes.registerType("vwire-status", VwireStatus);
 }
