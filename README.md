@@ -43,7 +43,27 @@ or a COM port on Windows.
 
 ```
 
+## Architecture
+
+Since a serial port is physical (i.e., cannot make copies), transaction layer works as MUX between vwire/vwire-in nodes and the sensor network.
+
+```
+
+      [vwire 1]  [vwire 2]  [vwire-in 1]
+          |          |          |
+    [transaction layer                 ]
+    [vwire common (serialport instance)]
+                     |
+                 UART/USB
+                     |
+                    MCU
+                     |
+               Sensor network
+```
+
 ## Implementation
+
+### Preparation
 
 Assuming that this repo is under /home/pi, modify ~/.node-red/settings.js as follows:
 
@@ -51,12 +71,18 @@ Assuming that this repo is under /home/pi, modify ~/.node-red/settings.js as fol
 nodesDir: '/home/pi/sensor-network-nodered/vwire',
 ```
 
+### Current implementation
+
 I have just made [a minimal implementation](./vwire):
 - vwire: control/manage the sensor network in a sequential manner.
 - vwire-in: receives time-series sensor data from the sensor network.
 - vwire-config: config shared by vwire and vwire-in instances.
 
 ![nodered](./doc/flow.png)
+
+Limitations:
+- Supports only one serial port.
+- Cannot perform parallel operations of a same command.
 
 ## TODO
 
