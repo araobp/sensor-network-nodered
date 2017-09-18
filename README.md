@@ -108,3 +108,5 @@ if vwire's name is set, vwire uses the name as msg.payload.command.
 vwire-in node supports pubsub to subscribe time-series data from a specific sensor.
 
 The operation is similar to BLE GATT: supports read(to read sensor data)/write(to control actuator)/notify(to notify sensor data).
+
+Before supporting this feature, this capability needs to be implemented: https://github.com/araobp/sensor-network/issues/1
