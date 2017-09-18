@@ -57,3 +57,16 @@ I have just made [a minimal implementation](./vwire):
 - vwire-config: config shared by vwire and vwire-in instances.
 
 ![nodered](./doc/flow.png)
+
+### msg format
+
+Node-RED's msg is used as a transaction block that traverses a Node-RED'S flow through nodes.
+
+The msg format is as follows:
+```
+msg:
+  payload:
+    command: <command>
+    deviceId: <id>
+    data: [<d1>, <d2>, ...]
+```
