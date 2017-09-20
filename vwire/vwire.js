@@ -67,6 +67,7 @@ module.exports = function(RED) {
                     if (c == 10) {  // '\n'(0x0a)
                         var dataString = new Buffer(buf).toString('utf8');
                         buf.length = 0;
+                        console.log(dataString);
                         if (parserEnabled) {
                             var startsWith = dataString.substring(0,1);
                             switch(startsWith) {
@@ -84,24 +85,34 @@ module.exports = function(RED) {
                                     var resp = dataString.split(':');
                                     var deviceId = parseInt(resp[0].slice(1,3));
                                     var converted = [];
-                                    var data = resp[2].split(',');
-                                    switch(resp[1]) {
-                                        case 'FLOAT':
-                                            for (var d of data) {
-                                                converted.push(parseFloat(d));
-                                            }
-                                            break;
-                                        default:
-                                            for (var d of data) {
-                                                converted.push(parseInt(d));
-                                            }
-                                            break;
+                                    if (resp[1] == 'NO_DATA') {
+                                        converted = null;
+                                    } else {
+                                        var data = resp[2].split(',');
+                                        switch(resp[1]) {
+                                            case 'FLOAT':
+                                                for (var d of data) {
+                                                    converted.push(parseFloat(d));
+                                                }
+                                                break;
+                                            default:
+                                                for (var d of data) {
+                                                    converted.push(parseInt(d));
+                                                }
+                                                break;
+                                        }
                                     }
 
                                     var msg = {payload: {
                                         deviceId: deviceId,
                                         data: converted
                                     }};
+
+                                    if ('SEN' in transactions) {
+                                        var dest = transactions.SEN;
+                                        delete transactions.SEN;
+                                        dest.send(msg);
+                                    }
                                         
                                     if ('_in' in transactions) {
                                         transactions._in.send(msg);
@@ -180,7 +191,8 @@ module.exports = function(RED) {
                 cmd = msg.payload;
             }
             if (parserEnabled) {
-                transactions[cmd] = node;
+                var cmd_name = cmd.split(':')[0]
+                transactions[cmd_name] = node;
             } else {
                 transactions._next = node;
             }
