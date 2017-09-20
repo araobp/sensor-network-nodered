@@ -3,7 +3,8 @@
         category: 'config',
         defaults: {
             port: {value:"/dev/ttyUSB0", required:true},
-            baudrate: {value:115200, required:true, validate:RED.validators.number()}
+            baudrate: {value:115200, required:true, validate:RED.validators.number()},
+            parser: {value:false}
         },
         label: function() {
             return this.port + '@' + this.baudrate;
@@ -41,7 +42,23 @@
         outputs:1,
         icon: "serial.png",
         label: function() {
-            return this.name||"vwire";
+            return this.name||"vwire in";
+        }
+    });
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('vwire-status', {
+        category: 'function',
+        color: "#9AFE2E",
+        defaults: {
+            name: {value:""}
+        },
+        inputs:0,
+        outputs:0,
+        icon: "serial.png",
+        label: function() {
+            return this.name||"vwire status";
         }
     });
 </script>
@@ -54,6 +71,9 @@
     <div class="form-row">
         <label for="node-config-input-baudrate"><i class="icon-tag"></i> Baudrate</label>
         <input type="text" id="node-config-input-baudrate" placeholder="Baudrate">
+    </div>
+    <div class="form-row"> <label for="node-config-input-parser"><i class="icon-tag"></i> Enable parser</label>
+        <input type="checkbox" id="node-config-input-parser" placeholder="Enable parser">
     </div>
 </script>
 
@@ -80,10 +100,21 @@
     </div>
 </script>
 
+<script type="text/x-red" data-template-name="vwire-status">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
 <script type="text/x-red" data-help-name="vwire">
     <p>A node to communicate with the sensor network.</p>
 </script>
 
 <script type="text/x-red" data-help-name="vwire-in">
     <p>A node to receive time-series data from the sensor network.</p>
+</script>
+
+<script type="text/x-red" data-help-name="vwire-status">
+    <p>A node to show its own status.</p>
 </script>
