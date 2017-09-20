@@ -76,6 +76,7 @@ nodesDir: '/home/pi/sensor-network-nodered/vwire',
 I have just made [a minimal implementation](./vwire):
 - vwire: control/manage the sensor network in a sequential manner.
 - vwire-in: receives time-series sensor data from the sensor network.
+- vwire-status: show the current status of port connectivity.
 - vwire-config: config shared by vwire and vwire-in instances.
 
 ![nodered](./doc/flow.png)
