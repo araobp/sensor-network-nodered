@@ -1,0 +1,9 @@
+{
+  "name": "vwire",
+  "version": "0.0.1",
+  "description": "virtual wires to interwork with a sensor network",
+  "author": "arao",
+  "dependencies": {
+      "serialport": "5.0.0"
+  }
+}
