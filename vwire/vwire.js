@@ -23,6 +23,8 @@ module.exports = function(RED) {
     var buf = []; 
     var statusIndicators = [];
     var portStatus = false;
+    var portName = null;
+    var portBaudrate = null;
     var parserEnabled = false;  // parser for https://github.com/araobp/sensor-network
 
     /*
@@ -47,11 +49,11 @@ module.exports = function(RED) {
     /*
      * Gets a serial port
      */
-    function getPort(params) {
+    function getPort() {
         if (port == null) { 
             updatePortStatus(null);
-            port = new SerialPort(params.port, {
-                baudRate: parseInt(params.baudrate),
+            port = new SerialPort(portName, {
+                baudRate: portBaudrate,
                 parser: SerialPort.parsers.raw,
                 autoOpen: true 
             });
@@ -59,7 +61,7 @@ module.exports = function(RED) {
                 console.log('trying to open port...');
                 port = null;
                 setTimeout(function() {
-                    getPort(params);
+                    getPort();
                 }, 1000);
             });
             port.on('data', function(data) {
@@ -67,10 +69,11 @@ module.exports = function(RED) {
                     if (c == 10) {  // '\n'(0x0a)
                         var dataString = new Buffer(buf).toString('utf8');
                         buf.length = 0;
+                        console.log(dataString);
                         if (parserEnabled) {
                             var startsWith = dataString.substring(0,1);
                             switch(startsWith) {
-                                case '$':
+                                case '$', '*':
                                     var resp = dataString.split(':');
                                     var command = resp[1];
                                     if (command in transactions) {
@@ -84,24 +87,34 @@ module.exports = function(RED) {
                                     var resp = dataString.split(':');
                                     var deviceId = parseInt(resp[0].slice(1,3));
                                     var converted = [];
-                                    var data = resp[2].split(',');
-                                    switch(resp[1]) {
-                                        case 'FLOAT':
-                                            for (var d of data) {
-                                                converted.push(parseFloat(d));
-                                            }
-                                            break;
-                                        default:
-                                            for (var d of data) {
-                                                converted.push(parseInt(d));
-                                            }
-                                            break;
+                                    if (resp[1] == 'NO_DATA') {
+                                        converted = null;
+                                    } else {
+                                        var converted = resp[2].split(',');
+                                        switch(resp[1]) {
+                                            case 'FLOAT':
+                                                converted.map(function(elm) {
+                                                    return parseFloat(elm);
+                                                });
+                                                break;
+                                            default:
+                                                converted.map(function(elm) {
+                                                    return parseInt(elm);
+                                                });
+                                                break;
+                                        }
                                     }
 
                                     var msg = {payload: {
                                         deviceId: deviceId,
                                         data: converted
                                     }};
+
+                                    if ('SEN' in transactions) {
+                                        var dest = transactions.SEN;
+                                        delete transactions.SEN;
+                                        dest.send(msg);
+                                    }
                                         
                                     if ('_in' in transactions) {
                                         transactions._in.send(msg);
@@ -111,7 +124,6 @@ module.exports = function(RED) {
                                     break;
                             }
                         } else {
-                            console.log(transactions);
                             var msg = {payload: dataString};
                             var dest = transactions._next;
                             delete transactions._next;
@@ -136,7 +148,7 @@ module.exports = function(RED) {
                 port = null;
                 updatePortStatus(false);
                 setTimeout(function() {
-                    getPort(params);
+                    getPort();
                 }, 1000);
             });
         }
@@ -151,6 +163,8 @@ module.exports = function(RED) {
         this.port = n.port;
         this.baudrate = n.baudrate;
         this.parser = n.parser;
+        portName = this.port;
+        portBaudrate = parseInt(this.baudrate);
         parserEnabled = this.parser;
         if (parserEnabled) {
             console.log('parser enabled');
@@ -161,26 +175,27 @@ module.exports = function(RED) {
         });
     }
     RED.nodes.registerType("vwire-config", VwireConfig);
-
-    function Vwire(config) {
+    
+    function vwire(config) {
         RED.nodes.createNode(this, config);
         var node = this;
         var params = RED.nodes.getNode(config.params);
         var command = null;
-        if (config.name != '') {
+        if ('name' in config && config.name != '') {
             command = config.name;
         }
         var noack = config.noack;
-        var port = getPort(params); 
+        var port = getPort(); 
         node.on('input', function(msg) {
             var cmd = null;
-            if (command) {
+            if (command != null) {
                 cmd = command;
             } else {
                 cmd = msg.payload;
             }
             if (parserEnabled) {
-                transactions[cmd] = node;
+                var cmd_name = cmd.split(':')[0]
+                transactions[cmd_name] = node;
             } else {
                 transactions._next = node;
             }
@@ -194,13 +209,50 @@ module.exports = function(RED) {
             done();
         });
     }
-    RED.nodes.registerType("vwire", Vwire);
+    
+    function vwireMaker(cmd, noack) {
+        function vwire(config) {
+            RED.nodes.createNode(this, config);
+            var node = this;
+            var params = RED.nodes.getNode(config.params);
+            var port = getPort(); 
+            node.on('input', function(msg) {
+                if (parserEnabled) {
+                    var cmd_name = cmd.split(':')[0]
+                    transactions[cmd_name] = node;
+                } else {
+                    transactions._next = node;
+                }
+                port.write(cmd + '\n');
+                if (noack) {
+                    node.send({payload: null});
+                }
+            });
+            node.on('close', function(removed, done) {
+                transactions = {};
+                done();
+            });
+        }
+        return vwire;
+    }
+    
+    RED.nodes.registerType("vwire", vwire);
+    
+    // The following nodes require ParserEnabled = true
+    RED.nodes.registerType("hall-sensor", vwireMaker("SEN:17", false));
+    RED.nodes.registerType("accelerometer", vwireMaker("SEN:19", false));
+    RED.nodes.registerType("temperature-humidity", vwireMaker("SEN:20", false));
+
+    // The following nodes require ParserEnabled = false
+    RED.nodes.registerType("door-status", vwireMaker("07", false));
+    RED.nodes.registerType("servo-unlock", vwireMaker("150", false));
+    RED.nodes.registerType("servo-lock", vwireMaker("1590", false));
 
     function VwireIn(config) {
         RED.nodes.createNode(this, config);
         var node = this;
         var params = RED.nodes.getNode(config.params);
-        getPort(params);
+        getPort();
         transactions['_in'] = node;
         node.on('close', function(removed, done) {
             transactions = {};
