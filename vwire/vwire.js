@@ -23,6 +23,8 @@ module.exports = function(RED) {
     var buf = []; 
     var statusIndicators = [];
     var portStatus = false;
+    var portName = null;
+    var portBaudrate = null;
     var parserEnabled = false;  // parser for https://github.com/araobp/sensor-network
 
     /*
@@ -47,11 +49,11 @@ module.exports = function(RED) {
     /*
      * Gets a serial port
      */
-    function getPort(params) {
+    function getPort() {
         if (port == null) { 
             updatePortStatus(null);
-            port = new SerialPort(params.port, {
-                baudRate: parseInt(params.baudrate),
+            port = new SerialPort(portName, {
+                baudRate: portBaudrate,
                 parser: SerialPort.parsers.raw,
                 autoOpen: true 
             });
@@ -59,7 +61,7 @@ module.exports = function(RED) {
                 console.log('trying to open port...');
                 port = null;
                 setTimeout(function() {
-                    getPort(params);
+                    getPort();
                 }, 1000);
             });
             port.on('data', function(data) {
@@ -122,7 +124,6 @@ module.exports = function(RED) {
                                     break;
                             }
                         } else {
-                            console.log(transactions);
                             var msg = {payload: dataString};
                             var dest = transactions._next;
                             delete transactions._next;
@@ -147,7 +148,7 @@ module.exports = function(RED) {
                 port = null;
                 updatePortStatus(false);
                 setTimeout(function() {
-                    getPort(params);
+                    getPort();
                 }, 1000);
             });
         }
@@ -162,6 +163,8 @@ module.exports = function(RED) {
         this.port = n.port;
         this.baudrate = n.baudrate;
         this.parser = n.parser;
+        portName = this.port;
+        portBaudrate = parseInt(this.baudrate);
         parserEnabled = this.parser;
         if (parserEnabled) {
             console.log('parser enabled');
@@ -182,7 +185,7 @@ module.exports = function(RED) {
             command = config.name;
         }
         var noack = config.noack;
-        var port = getPort(params); 
+        var port = getPort(); 
         node.on('input', function(msg) {
             var cmd = null;
             if (command != null) {
@@ -190,11 +193,9 @@ module.exports = function(RED) {
             } else {
                 cmd = msg.payload;
             }
-            console.log(parserEnabled);
             if (parserEnabled) {
                 var cmd_name = cmd.split(':')[0]
                 transactions[cmd_name] = node;
-                console.log(transactions);
             } else {
                 transactions._next = node;
             }
@@ -214,13 +215,11 @@ module.exports = function(RED) {
             RED.nodes.createNode(this, config);
             var node = this;
             var params = RED.nodes.getNode(config.params);
-            var port = getPort(params); 
+            var port = getPort(); 
             node.on('input', function(msg) {
-                console.log(parserEnabled);
                 if (parserEnabled) {
                     var cmd_name = cmd.split(':')[0]
                     transactions[cmd_name] = node;
-                    console.log(transactions);
                 } else {
                     transactions._next = node;
                 }
@@ -253,7 +252,7 @@ module.exports = function(RED) {
         RED.nodes.createNode(this, config);
         var node = this;
         var params = RED.nodes.getNode(config.params);
-        getPort(params);
+        getPort();
         transactions['_in'] = node;
         node.on('close', function(removed, done) {
             transactions = {};
