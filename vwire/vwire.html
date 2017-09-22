@@ -15,7 +15,7 @@
 <script type="text/javascript">
     RED.nodes.registerType('vwire', {
         category: 'sensor network',
-        color: "#9AFE2E",
+        color: "#3FADB5",
         defaults: {
             name: {value:""},
             noack: {value:false}
@@ -32,7 +32,7 @@
 <script type="text/javascript">
     RED.nodes.registerType('hall-sensor', {
         category: 'sensor network',
-        color: "#9AFE2E",
+        color: "#3FADB5",
         defaults: {
             name: {value:""}
         },
@@ -40,7 +40,7 @@
         outputs:1,
         icon: "serial.png",
         label: function() {
-            return this.name||"hall-sensor";
+            return this.name||"hall sensor";
         }
     });
 </script>
@@ -48,7 +48,7 @@
 <script type="text/javascript">
     RED.nodes.registerType('accelerometer', {
         category: 'sensor network',
-        color: "#9AFE2E",
+        color: "#3FADB5",
         defaults: {
             name: {value:""}
         },
@@ -64,7 +64,7 @@
 <script type="text/javascript">
     RED.nodes.registerType('temperature-humidity', {
         category: 'sensor network',
-        color: "#9AFE2E",
+        color: "#3FADB5",
         defaults: {
             name: {value:""}
         },
@@ -72,7 +72,7 @@
         outputs:1,
         icon: "serial.png",
         label: function() {
-            return this.name||"temperature-humidity";
+            return this.name||"temperature humidity";
         }
     });
 </script>
@@ -80,7 +80,7 @@
 <script type="text/javascript">
     RED.nodes.registerType('door-status', {
         category: 'sensor network',
-        color: "#9AFE2E",
+        color: "#3FADB5",
         defaults: {
             name: {value:""}
         },
@@ -88,15 +88,15 @@
         outputs:1,
         icon: "serial.png",
         label: function() {
-            return this.name||"door-status";
+            return this.name||"door status";
         }
     });
 </script>
 
 <script type="text/javascript">
-    RED.nodes.registerType('servo-unlock', {
+    RED.nodes.registerType('door-unlock', {
         category: 'sensor network',
-        color: "#9AFE2E",
+        color: "#3FADB5",
         defaults: {
             name: {value:""}
         },
@@ -104,15 +104,15 @@
         outputs:1,
         icon: "serial.png",
         label: function() {
-            return this.name||"servo-unlock";
+            return this.name||"door unlock";
         }
     });
 </script>
 
 <script type="text/javascript">
-    RED.nodes.registerType('servo-lock', {
+    RED.nodes.registerType('door-lock', {
         category: 'sensor network',
-        color: "#9AFE2E",
+        color: "#3FADB5",
         defaults: {
             name: {value:""}
         },
@@ -120,7 +120,39 @@
         outputs:1,
         icon: "serial.png",
         label: function() {
-            return this.name||"servo-lock";
+            return this.name||"door lock";
+        }
+    });
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('door-led-on', {
+        category: 'sensor network',
+        color: "#3FADB5",
+        defaults: {
+            name: {value:""}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "serial.png",
+        label: function() {
+            return this.name||"door led on";
+        }
+    });
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('door-led-off', {
+        category: 'sensor network',
+        color: "#3FADB5",
+        defaults: {
+            name: {value:""}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "serial.png",
+        label: function() {
+            return this.name||"door led off";
         }
     });
 </script>
@@ -128,7 +160,7 @@
 <script type="text/javascript">
     RED.nodes.registerType('vwire-in', {
         category: 'sensor network',
-        color: "#9AFE2E",
+        color: "#3FADB5",
         defaults: {
             name: {value:""}
         },
@@ -144,7 +176,7 @@
 <script type="text/javascript">
     RED.nodes.registerType('vwire-status', {
         category: 'sensor network',
-        color: "#9AFE2E",
+        color: "#3FADB5",
         defaults: {
             name: {value:""},
             params: {value:"", type:"vwire-config"}
