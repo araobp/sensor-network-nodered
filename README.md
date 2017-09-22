@@ -79,6 +79,8 @@ I have just made [a minimal implementation](./vwire):
 - vwire-status: show the current status of port connectivity.
 - vwire-config: config shared by vwire and vwire-in instances.
 
+And vwireMaker() closure makes nodes of specific sensors.
+
 ![nodered](./doc/flow.png)
 
 Limitations:

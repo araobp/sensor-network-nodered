@@ -34,13 +34,17 @@ module.exports = function(RED) {
         if (status != null) {
             portStatus = status;
         }
+        var parser = '';
+        if (parserEnabled) {
+            parser = ', parser on';
+        }
         for (var s of statusIndicators) {
             switch(portStatus) {
                 case true:
-                    s.status({fill:"green",shape:"dot",text:"connected"});
+                    s.status({fill:"green",shape:"dot",text:"connected"+parser});
                     break;
                 case false:
-                    s.status({fill:"red",shape:"dot",text:"disconnected"});
+                    s.status({fill:"red",shape:"dot",text:"disconnected"+parser});
                     break;
             }
         }
@@ -124,6 +128,16 @@ module.exports = function(RED) {
                                     break;
                             }
                         } else {
+                            try {
+                                dataString = parseInt(dataString);
+                            } catch (e) {
+                                console.log('not integer');
+                            }
+                            try {
+                                dataString = parseFloat(dataString);
+                            } catch (e) {
+                                console.log('not float');
+                            }
                             var msg = {payload: dataString};
                             var dest = transactions._next;
                             delete transactions._next;
@@ -245,8 +259,10 @@ module.exports = function(RED) {
 
     // The following nodes require ParserEnabled = false
     RED.nodes.registerType("door-status", vwireMaker("07", false));
-    RED.nodes.registerType("servo-unlock", vwireMaker("150", false));
-    RED.nodes.registerType("servo-lock", vwireMaker("1590", false));
+    RED.nodes.registerType("door-unlock", vwireMaker("150", false));
+    RED.nodes.registerType("door-lock", vwireMaker("1590", false));
+    RED.nodes.registerType("door-led-on", vwireMaker("180", true));
+    RED.nodes.registerType("door-led-off", vwireMaker("181", true));
 
     function VwireIn(config) {
         RED.nodes.createNode(this, config);
