@@ -87,36 +87,9 @@ Limitations:
 - Supports only one serial port.
 - Cannot perform parallel operations of a same command.
 
-## TODO
+### TODO: BLE interface
 
-### msg format
-
-Node-RED's msg is used as a transaction block that traverses a Node-RED'S flow through nodes.
-
-The msg format is as follows:
-```
-msg:
-  payload:
-    state: <state>
-    command: <command>
-    result: <result>
-    deviceId: <id>
-    data: [<d1>, <d2>, ...]
-```
-
-if vwire's name is set, vwire uses the name as msg.payload.command.
-
-### pubsub to the sensor network
-
-vwire-in node supports pubsub to subscribe time-series data from a specific sensor.
-
-The operation is similar to BLE GATT: supports read(to read sensor data)/write(to control actuator)/notify(to notify sensor data).
-
-Before supporting this feature, this capability needs to be implemented: https://github.com/araobp/sensor-network/issues/1
-
-### BLE interface
-
-A priate BLE GATT service is provied with characteristics corresponding to the read/write/notify operations described in the above.
+A priate BLE GATT service is to be provided.
 
 I am developing a serial communication service between Microchip's RN4020 and Node-RED/Android:
 
