@@ -78,6 +78,70 @@
 </script>
 
 <script type="text/javascript">
+    RED.nodes.registerType('device-map', {
+        category: 'sensor network',
+        color: "#3FADB5",
+        defaults: {
+            name: {value:""}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "serial.png",
+        label: function() {
+            return this.name||"device map";
+        }
+    });
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('schedule', {
+        category: 'sensor network',
+        color: "#3FADB5",
+        defaults: {
+            name: {value:""}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "serial.png",
+        label: function() {
+            return this.name||"schedule";
+        }
+    });
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('start', {
+        category: 'sensor network',
+        color: "#3FADB5",
+        defaults: {
+            name: {value:""}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "serial.png",
+        label: function() {
+            return this.name||"start";
+        }
+    });
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('stop', {
+        category: 'sensor network',
+        color: "#3FADB5",
+        defaults: {
+            name: {value:""}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "serial.png",
+        label: function() {
+            return this.name||"stop";
+        }
+    });
+</script>
+
+<script type="text/javascript">
     RED.nodes.registerType('door-status', {
         category: 'sensor network',
         color: "#3FADB5",

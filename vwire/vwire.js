@@ -49,7 +49,7 @@ module.exports = function(RED) {
             }
         }
     }
-    
+
     /*
      * Gets a serial port
      */
@@ -62,7 +62,6 @@ module.exports = function(RED) {
                 autoOpen: true 
             });
             port.on('error', function(data) {
-                console.log('trying to open port...');
                 port = null;
                 setTimeout(function() {
                     getPort();
@@ -71,24 +70,34 @@ module.exports = function(RED) {
             port.on('data', function(data) {
                 for (var c of data) {
                     if (c == 10) {  // '\n'(0x0a)
-                        var dataString = new Buffer(buf).toString('utf8');
+                        var respString = new Buffer(buf).toString('utf8');
+                        var resp = null;
                         buf.length = 0;
-                        console.log(dataString);
+                        console.log(respString);
                         if (parserEnabled) {
-                            var startsWith = dataString.substring(0,1);
+                            var startsWith = respString.charAt(0);
                             switch(startsWith) {
-                                case '$', '*':
-                                    var resp = dataString.split(':');
+                                case '$':
+                                case '*':
+                                    resp = respString.split(':');
                                     var command = resp[1];
+                                    var msg = null;
                                     if (command in transactions) {
-                                        var msg = {payload: resp[2]};
-                                        var dest = transactions[command];
+                                        var transaction = transactions[command];
+                                        var dest = transaction[0];
+                                        var parserExtension = transaction[1]; 
                                         delete transactions[command];
+                                        var msg = null;
+                                        if (parserExtension != null) {
+                                            msg = {payload: parserExtension(resp[2])};
+                                        } else {
+                                            msg = {payload: resp[2]};
+                                        }
                                         dest.send(msg);
                                     }
                                     break;
                                 case '%':
-                                    var resp = dataString.split(':');
+                                    resp = respString.split(':');
                                     var deviceId = parseInt(resp[0].slice(1,3));
                                     var converted = [];
                                     if (resp[1] == 'NO_DATA') {
@@ -97,14 +106,10 @@ module.exports = function(RED) {
                                         var converted = resp[2].split(',');
                                         switch(resp[1]) {
                                             case 'FLOAT':
-                                                converted.map(function(elm) {
-                                                    return parseFloat(elm);
-                                                });
+                                                converted.map(elm => parseFloat(elm));
                                                 break;
                                             default:
-                                                converted.map(function(elm) {
-                                                    return parseInt(elm);
-                                                });
+                                                converted.map(elm => parseInt(elm));
                                                 break;
                                         }
                                     }
@@ -115,7 +120,7 @@ module.exports = function(RED) {
                                     }};
 
                                     if ('SEN' in transactions) {
-                                        var dest = transactions.SEN;
+                                        var dest = transactions.SEN[0];
                                         delete transactions.SEN;
                                         dest.send(msg);
                                     }
@@ -129,17 +134,17 @@ module.exports = function(RED) {
                             }
                         } else {
                             try {
-                                dataString = parseInt(dataString);
+                                resp = parseInt(dataString);
                             } catch (e) {
                                 console.log('not integer');
                             }
                             try {
-                                dataString = parseFloat(dataString);
+                                resp = parseFloat(dataString);
                             } catch (e) {
                                 console.log('not float');
                             }
-                            var msg = {payload: dataString};
-                            var dest = transactions._next;
+                            var msg = {payload: resp};
+                            var dest = transactions._next[0];
                             delete transactions._next;
                             try {
                                 dest.send(msg);
@@ -147,7 +152,7 @@ module.exports = function(RED) {
                                 console.log(e);
                             }
                             if ('_in' in transactions) {
-                                transactions._in.send(msg);
+                                transactions._in[0].send(msg);
                             }
                         }
                     } else {
@@ -209,9 +214,9 @@ module.exports = function(RED) {
             }
             if (parserEnabled) {
                 var cmd_name = cmd.split(':')[0]
-                transactions[cmd_name] = node;
+                transactions[cmd_name] = [node, null];
             } else {
-                transactions._next = node;
+                transactions._next = [node, null];
             }
             port.write(cmd + '\n');
             if (noack) {
@@ -223,8 +228,9 @@ module.exports = function(RED) {
             done();
         });
     }
+    RED.nodes.registerType("vwire", vwire);
     
-    function vwireMaker(cmd, noack) {
+    function vwireMaker(cmd, noack, parserExtension) {
         function vwire(config) {
             RED.nodes.createNode(this, config);
             var node = this;
@@ -233,13 +239,13 @@ module.exports = function(RED) {
             node.on('input', function(msg) {
                 if (parserEnabled) {
                     var cmd_name = cmd.split(':')[0]
-                    transactions[cmd_name] = node;
+                    transactions[cmd_name] = [node, parserExtension];
                 } else {
-                    transactions._next = node;
+                    transactions._next = [node, parserExtension];
                 }
                 port.write(cmd + '\n');
                 if (noack) {
-                    node.send({payload: null});
+                    node.send({payload: parserExtension});
                 }
             });
             node.on('close', function(removed, done) {
@@ -249,27 +255,27 @@ module.exports = function(RED) {
         }
         return vwire;
     }
-    
-    RED.nodes.registerType("vwire", vwire);
-    
     // The following nodes require ParserEnabled = true
-    RED.nodes.registerType("hall-sensor", vwireMaker("SEN:17", false));
-    RED.nodes.registerType("accelerometer", vwireMaker("SEN:19", false));
-    RED.nodes.registerType("temperature-humidity", vwireMaker("SEN:20", false));
-
+    RED.nodes.registerType("hall-sensor", vwireMaker("SEN:17", false, null));
+    RED.nodes.registerType("accelerometer", vwireMaker("SEN:19", false, null));
+    RED.nodes.registerType("temperature-humidity", vwireMaker("SEN:20", false, null));
+    RED.nodes.registerType("device-map", vwireMaker("MAP", false, resp => resp.split(',')));
+    RED.nodes.registerType("schedule", vwireMaker("RSC", false, resp => resp.split('|').map(elm => elm.split(','))));
+    RED.nodes.registerType("start", vwireMaker("STA", true, null));
+    RED.nodes.registerType("stop", vwireMaker("STP", false, null));
     // The following nodes require ParserEnabled = false
-    RED.nodes.registerType("door-status", vwireMaker("07", false));
-    RED.nodes.registerType("door-unlock", vwireMaker("150", false));
-    RED.nodes.registerType("door-lock", vwireMaker("1590", false));
-    RED.nodes.registerType("door-led-on", vwireMaker("180", true));
-    RED.nodes.registerType("door-led-off", vwireMaker("181", true));
+    RED.nodes.registerType("door-status", vwireMaker("07", false, null));
+    RED.nodes.registerType("door-unlock", vwireMaker("150", false, null));
+    RED.nodes.registerType("door-lock", vwireMaker("1590", false, null));
+    RED.nodes.registerType("door-led-on", vwireMaker("180", true, null));
+    RED.nodes.registerType("door-led-off", vwireMaker("181", true, null));
 
     function VwireIn(config) {
         RED.nodes.createNode(this, config);
         var node = this;
         var params = RED.nodes.getNode(config.params);
         getPort();
-        transactions['_in'] = node;
+        transactions._in = [node, null];
         node.on('close', function(removed, done) {
             transactions = {};
             done();
