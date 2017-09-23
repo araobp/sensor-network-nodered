@@ -33,6 +33,14 @@ vwire-19: [sensor, device ID 19]--wire--[Node-RED/RasPi]
 
 The sensor network protocol supports plug&play, and "device-map" node in the Node-RED palette can be used to show all the devices attached to the network currently.
 
+The following is a sample flow:
+
+![nodered](./doc/flow.png)
+
+And a picture of the (physical) lcd showing "Hello World!":
+
+![lcd](./doc/lcd.jpg)
+
 ## Sequence
 
 ```
@@ -101,8 +109,6 @@ I have just made [a minimal implementation](./vwire):
 - vwire-config: config shared by vwire and vwire-in instances.
 
 And vwireMaker() closure makes nodes of specific sensors.
-
-![nodered](./doc/flow.png)
 
 Limitations:
 - Supports only one serial port.
