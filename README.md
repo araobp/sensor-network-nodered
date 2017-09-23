@@ -12,6 +12,18 @@ Once I tested [SONY Koov](https://www.sony.com/koov) that has a Scratch-like pro
 
 The goal of this project is to see if it is possible to create synchronous and coarse-grained nodes on Node-RED to control my miniature things in a sequence-control manner. Some of them use [this sensor network protocol](https://github.com/araobp/sensor-network).
 
+## Construct
+
+I use RasPi 3 for this project, but I don't use those physical pins on RasPi because of the complicated physical wirling that kids never like. Instead, this project provides virtual wires (vwire) connected to each physical devices at logical device IDs.
+
+```
+
+                                                                Node-RED
+    +--------+--------+------[master/scheduler]--UART/USB(vcp)--[RasPi]
+    |        |        |
+[sensor] [sensor] [actuator]
+```
+
 ## Sequence
 
 ```
