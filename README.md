@@ -23,6 +23,12 @@ I use RasPi 3 for this project, but I don't use those physical pins on RasPi bec
     |          |          |
 [sensor]   [sensor]   [actuator]  ...
 device ID  device ID  device ID
+   17         19         16
+   
+vwire-16: [actuator, device ID 16]--wire--[Node-RED/RasPi]
+vwire-17: [sensor, device ID 17]--wire--[Node-RED/RasPi]
+vwire-19: [sensor, device ID 19]--wire--[Node-RED/RasPi]
+
 ```
 
 ## Sequence
