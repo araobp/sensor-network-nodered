@@ -142,6 +142,22 @@
 </script>
 
 <script type="text/javascript">
+    RED.nodes.registerType('lcd', {
+        category: 'sensor network',
+        color: "#3FADB5",
+        defaults: {
+            name: {value:""}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "serial.png",
+        label: function() {
+            return this.name||"lcd";
+        }
+    });
+</script>
+
+<script type="text/javascript">
     RED.nodes.registerType('door-status', {
         category: 'sensor network',
         color: "#3FADB5",
@@ -265,6 +281,13 @@
     </div>
     <div class="form-row"> <label for="node-config-input-parser"><i class="icon-tag"></i> Enable parser</label>
         <input type="checkbox" id="node-config-input-parser" placeholder="Enable parser">
+    </div>
+</script>
+
+<script type="text/x-red" data-template-name="lcd">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
     </div>
 </script>
 

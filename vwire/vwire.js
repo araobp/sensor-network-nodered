@@ -18,6 +18,8 @@ module.exports = function(RED) {
     const SerialPort = require('serialport');
     const parsers = SerialPort.parsers;
 
+    const CMD_SEND_INTERVAL = 80; // 80 msec interval at minimum
+
     var port = null;
     var transactions = {};
     var buf = []; 
@@ -26,6 +28,29 @@ module.exports = function(RED) {
     var portName = null;
     var portBaudrate = null;
     var parserEnabled = false;  // parser for https://github.com/araobp/sensor-network
+
+    /*
+     * Sends commands to serial port at a specific interval
+     */
+    function sendCommands(node, cmdList, payload, index, port) {
+        if (port == null) {
+            port = getPort();
+        }
+        var cmd = cmdList.shift();
+        if (cmd != null) {
+            if (index == 0) {
+                port.write(cmd + payload + '\n');
+            } else {
+                port.write(cmd + '\n');
+            }
+            setTimeout(function() {
+                index = index - 1;
+                sendCommands(node, cmdList, payload, index, port);
+            }, CMD_SEND_INTERVAL);
+        } else {
+            node.send({msg: null});
+        }
+    }
 
     /*
      * Updates port statu on vwire-status node
@@ -255,6 +280,39 @@ module.exports = function(RED) {
         }
         return vwire;
     }
+
+    /*
+     * Limitation: 
+     * (1) cmdList cannot have same commands.
+     * (2) this function works only for nodes with noack = true and parserEnabled = true.
+     */
+    function vwireCmdListMaker(cmdList, index) {
+        function vwire(config) {
+            RED.nodes.createNode(this, config);
+            var node = this;
+            var params = RED.nodes.getNode(config.params);
+            var port = getPort(); 
+            var cmd = null;
+            if ('name' in config && config.name != '') {
+                cmd = config.name;
+            }
+            node.on('input', function(msg) {
+                var payload = null;
+                if (cmd == null) {
+                    payload = msg.payload;
+                } else {
+                    payload = cmd;
+                }
+                sendCommands(node, [].concat(cmdList), payload, index, null);
+            });
+            node.on('close', function(removed, done) {
+                transactions = {};
+                done();
+            });
+        }
+        return vwire;
+    }
+
     // The following nodes require ParserEnabled = true
     RED.nodes.registerType("hall-sensor", vwireMaker("SEN:17", false, null));
     RED.nodes.registerType("accelerometer", vwireMaker("SEN:19", false, null));
@@ -263,6 +321,7 @@ module.exports = function(RED) {
     RED.nodes.registerType("schedule", vwireMaker("RSC", false, resp => resp.split('|').map(elm => elm.split(','))));
     RED.nodes.registerType("start", vwireMaker("STA", true, null));
     RED.nodes.registerType("stop", vwireMaker("STP", false, null));
+    RED.nodes.registerType("lcd", vwireCmdListMaker(["I2C:16", "CLR", "STR:", "I2C:1"], 2));
     // The following nodes require ParserEnabled = false
     RED.nodes.registerType("door-status", vwireMaker("07", false, null));
     RED.nodes.registerType("door-unlock", vwireMaker("150", false, null));
