@@ -31,6 +31,8 @@ vwire-19: [sensor, device ID 19]--wire--[Node-RED/RasPi]
 
 ```
 
+The sensor network protocol supports plug&play, and "device-map" node in the Node-RED palette can be used to show all the devices attached to the network currently.
+
 ## Sequence
 
 ```
