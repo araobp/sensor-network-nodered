@@ -19,9 +19,10 @@ I use RasPi 3 for this project, but I don't use those physical pins on RasPi bec
 ```
 
                                                                 Node-RED
-    +--------+--------+------[master/scheduler]--UART/USB(vcp)--[RasPi]
-    |        |        |
-[sensor] [sensor] [actuator]
+    +----------+----------+---[master/scheduler]--UART/USB(vcp)--[RasPi]
+    |          |          |
+[sensor]   [sensor]   [actuator]  ...
+device ID  device ID  device ID
 ```
 
 ## Sequence
