@@ -18,38 +18,75 @@ module.exports = function(RED) {
     const SerialPort = require('serialport');
     const parsers = SerialPort.parsers;
 
-    const CMD_SEND_INTERVAL = 80; // 80 msec interval at minimum
+    const CMD_SEND_INTERVAL = 100; // 100 msec interval at minimum
 
     var port = null;
     var transactions = {};
-    var buf = []; 
+    var buf = [];  // receive buffer
     var statusIndicators = [];
-    var portStatus = false;
+    var portOpened = false;
     var portName = null;
     var portBaudrate = null;
     var parserEnabled = false;  // parser for https://github.com/araobp/sensor-network
+    var sendQueue = [];
 
     /*
-     * Sends commands to serial port at a specific interval
+     * Schedule
+     * 8msec, 16msec, 48msec, 96msec, 480msec, 960msec, 4800msec 
      */
-    function sendCommands(node, cmdList, payload, index, port) {
-        if (port == null) {
-            port = getPort();
-        }
-        var cmd = cmdList.shift();
-        if (cmd != null) {
-            if (index == 0) {
-                port.write(cmd + payload + '\n');
-            } else {
-                port.write(cmd + '\n');
+    var schedule = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+    var subscriptions = [];
+
+    function cleanUp() {
+        transactions = {};
+        schedule = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+        subscriptions.length = 0;
+        sendQueue.length = 0;
+    }
+
+    /*
+     * Sends a series of commands to serial port at a specific interval
+     */
+    function sendCommands(node, cmdList, payload, index) {
+        sendQueue.push({
+            node: node,
+            cmdList: cmdList,
+            payload: payload,
+            index: index
+        });
+    }
+
+    function startSenderLoop(port) {
+        var batch = null;
+        var node = null;
+        var cmd = null;
+        var payload = null;
+        var index = null;
+
+        setInterval(function() {
+            if (batch != null) {
+                cmd = batch.cmdList.shift();
+            } else if (sendQueue.length > 0) {
+                batch = sendQueue.shift();
+                node = batch.node;
+                cmd = batch.cmdList.shift();
+                payload = batch.payload;
+                index = batch.index;
             }
-            setTimeout(function() {
+            if (cmd) {
+                if (index == 0 && payload != null) {
+                    port.write(cmd + payload + '\n');
+                } else {
+                    port.write(cmd + '\n');
+                }
                 index = index - 1;
-                sendCommands(node, cmdList, payload, index, port);
-            }, CMD_SEND_INTERVAL);
-        } else {
-            node.send({msg: null});
-        }
+            } else {
+                if (node!= null) {
+                    node.send({msg: null});
+                }
+                batch = null;
+            }
+        }, CMD_SEND_INTERVAL);
     }
 
     /*
@@ -57,14 +94,14 @@ module.exports = function(RED) {
      */
     function updatePortStatus(status) {
         if (status != null) {
-            portStatus = status;
+            portOpened = status;
         }
         var parser = '';
         if (parserEnabled) {
             parser = ', parser on';
         }
         for (var s of statusIndicators) {
-            switch(portStatus) {
+            switch(portOpened) {
                 case true:
                     s.status({fill:"green",shape:"dot",text:"connected"+parser});
                     break;
@@ -85,6 +122,12 @@ module.exports = function(RED) {
                 baudRate: portBaudrate,
                 parser: SerialPort.parsers.raw,
                 autoOpen: true 
+            });
+            port.on('open', function() {
+                var cmdList = ['STP', 'CSC'].concat(subscriptions);
+                //console.log(cmdList);
+                startSenderLoop(port);
+                sendCommands(null, cmdList, null, 0, port);
             });
             port.on('error', function(data) {
                 port = null;
@@ -151,7 +194,14 @@ module.exports = function(RED) {
                                     }
                                         
                                     if ('_in' in transactions) {
-                                        transactions._in.send(msg);
+                                        var dest = transactions._in[0];
+                                        dest.send(msg);
+                                    }
+
+                                    var deviceIdString = deviceId.toString();
+                                    if (deviceIdString in transactions) {
+                                        var dest = transactions[deviceIdString][0];
+                                        dest.send(msg);
                                     }
                                     break;
                                 default:
@@ -189,6 +239,7 @@ module.exports = function(RED) {
                 updatePortStatus(true);
             });
             port.on('close', function() {
+                cleanUp();
                 port = null;
                 updatePortStatus(false);
                 setTimeout(function() {
@@ -198,6 +249,7 @@ module.exports = function(RED) {
         }
         return port;
     }
+
     
     /*
      * vwire-config node
@@ -214,16 +266,39 @@ module.exports = function(RED) {
             console.log('parser enabled');
         }
         this.on('close', function(removed, done) {
-            transactions = {};
+            cleanUp(); 
             done();
         });
     }
     RED.nodes.registerType("vwire-config", VwireConfig);
+
+    function VwireIn(config) {
+        RED.nodes.createNode(this, config);
+        var node = this;
+        getPort();
+        transactions._in = [node, null];
+        node.on('close', function(removed, done) {
+            cleanUp();
+            done();
+        });
+    }
+    RED.nodes.registerType("vwire-in", VwireIn);
+
+    function VwireStatus(config) {
+        RED.nodes.createNode(this, config);
+        var node = this;
+        statusIndicators.push(node);
+        updatePortStatus(null);
+        node.on('close', function(removed, done) {
+            cleanUp(); 
+            done();
+        });
+    }
+    RED.nodes.registerType("vwire-status", VwireStatus);
     
     function vwire(config) {
         RED.nodes.createNode(this, config);
         var node = this;
-        var params = RED.nodes.getNode(config.params);
         var command = null;
         if ('name' in config && config.name != '') {
             command = config.name;
@@ -249,7 +324,7 @@ module.exports = function(RED) {
             }
         });
         node.on('close', function(removed, done) {
-            transactions = {};
+            cleanUp(); 
             done();
         });
     }
@@ -259,7 +334,6 @@ module.exports = function(RED) {
         function vwire(config) {
             RED.nodes.createNode(this, config);
             var node = this;
-            var params = RED.nodes.getNode(config.params);
             var port = getPort(); 
             node.on('input', function(msg) {
                 if (parserEnabled) {
@@ -274,7 +348,7 @@ module.exports = function(RED) {
                 }
             });
             node.on('close', function(removed, done) {
-                transactions = {};
+                cleanUp();
                 done();
             });
         }
@@ -290,7 +364,6 @@ module.exports = function(RED) {
         function vwire(config) {
             RED.nodes.createNode(this, config);
             var node = this;
-            var params = RED.nodes.getNode(config.params);
             var port = getPort(); 
             var cmd = null;
             if ('name' in config && config.name != '') {
@@ -306,7 +379,53 @@ module.exports = function(RED) {
                 sendCommands(node, [].concat(cmdList), payload, index, null);
             });
             node.on('close', function(removed, done) {
-                transactions = {};
+                cleanUp();
+                done();
+            });
+        }
+        return vwire;
+    }
+
+    /*
+     * Limitation: 
+     * (1) this function works only for nodes with parserEnabled = true.
+     */
+    function vwireSubscriberMaker(deviceId) {
+        function vwire(config) {
+            RED.nodes.createNode(this, config);
+            var node = this;
+            var port = getPort(); 
+            var timer = ('timer' in config) ? config.timer : 5;
+            var timeslot = schedule[timer];
+            var i;
+            for (i=0; i<4; i++) {
+                if (timeslot[i] == 0) {
+                    timeslot[i] = deviceId;
+                    break;
+                }
+            }
+            var pos = 4 * timer + i;
+            /*
+            console.log(timeslot);
+            console.log(pos);
+            console.log(timer);
+            console.log(i);
+            */
+
+            var subscription = ['POS:'+pos.toString(), 'WSC:'+deviceId, 'STA'];
+            if (port.isOpen) {
+                console.log('port is open');
+                sendCommands(null, subscription, null, 0, port);
+            } else {
+                console.log('port is still not open');
+                subscriptions = subscriptions.concat(subscription);
+                console.log(subscriptions);
+            }
+
+            transactions[deviceId.toString()] = [node, null]; 
+            
+            node.on('close', function(removed, done) {
+                cleanUp();
                 done();
             });
         }
@@ -322,35 +441,13 @@ module.exports = function(RED) {
     RED.nodes.registerType("start", vwireMaker("STA", true, null));
     RED.nodes.registerType("stop", vwireMaker("STP", false, null));
     RED.nodes.registerType("lcd", vwireCmdListMaker(["I2C:16", "CLR", "STR:", "I2C:1"], 2));
+    RED.nodes.registerType("hall-sensor-subscriber", vwireSubscriberMaker(17));
+    RED.nodes.registerType("accelerometer-subscriber", vwireSubscriberMaker(19));
+    RED.nodes.registerType("temperature-humidity-subscriber", vwireSubscriberMaker(20));
     // The following nodes require ParserEnabled = false
     RED.nodes.registerType("door-status", vwireMaker("07", false, null));
     RED.nodes.registerType("door-unlock", vwireMaker("150", false, null));
     RED.nodes.registerType("door-lock", vwireMaker("1590", false, null));
     RED.nodes.registerType("door-led-on", vwireMaker("180", true, null));
     RED.nodes.registerType("door-led-off", vwireMaker("181", true, null));
-
-    function VwireIn(config) {
-        RED.nodes.createNode(this, config);
-        var node = this;
-        var params = RED.nodes.getNode(config.params);
-        getPort();
-        transactions._in = [node, null];
-        node.on('close', function(removed, done) {
-            transactions = {};
-            done();
-        });
-    }
-    RED.nodes.registerType("vwire-in", VwireIn);
-
-    function VwireStatus(config) {
-        RED.nodes.createNode(this, config);
-        var node = this;
-        statusIndicators.push(node);
-        updatePortStatus(null);
-        node.on('close', function(removed, done) {
-            statusIndicators = [];
-            done();
-        });
-    }
-    RED.nodes.registerType("vwire-status", VwireStatus);
 }

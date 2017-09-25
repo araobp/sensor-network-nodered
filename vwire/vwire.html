@@ -46,6 +46,24 @@
 </script>
 
 <script type="text/javascript">
+    RED.nodes.registerType('hall-sensor-subscriber', {
+        category: 'sensor network',
+        color: "#3FADB5",
+        defaults: {
+            name: {value:""},
+            timer: {value:3, required:true, validate:RED.validators.number()}
+        },
+        inputs:0,
+        outputs:1,
+        icon: "serial.png",
+        align: 'right',
+        label: function() {
+            return this.name||"hall sensor";
+        }
+    });
+</script>
+
+<script type="text/javascript">
     RED.nodes.registerType('accelerometer', {
         category: 'sensor network',
         color: "#3FADB5",
@@ -62,6 +80,24 @@
 </script>
 
 <script type="text/javascript">
+    RED.nodes.registerType('accelerometer-subscriber', {
+        category: 'sensor network',
+        color: "#3FADB5",
+        defaults: {
+            name: {value:""},
+            timer: {value:3, required:true, validate:RED.validators.number()}
+        },
+        inputs:0,
+        outputs:1,
+        icon: "serial.png",
+        align: 'right',
+        label: function() {
+            return this.name||"accelerometer";
+        }
+    });
+</script>
+
+<script type="text/javascript">
     RED.nodes.registerType('temperature-humidity', {
         category: 'sensor network',
         color: "#3FADB5",
@@ -71,6 +107,24 @@
         inputs:1,
         outputs:1,
         icon: "serial.png",
+        label: function() {
+            return this.name||"temperature humidity";
+        }
+    });
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('temperature-humidity-subscriber', {
+        category: 'sensor network',
+        color: "#3FADB5",
+        defaults: {
+            name: {value:""},
+            timer: {value:5, required:true, validate:RED.validators.number()}
+        },
+        inputs:0,
+        outputs:1,
+        icon: "serial.png",
+        align: 'right',
         label: function() {
             return this.name||"temperature humidity";
         }
@@ -314,6 +368,27 @@
         <input type="text" id="node-input-name" placeholder="Name">
     <div class="form-row"> <label for="node-input-params"><i class="icon-tag"></i> Serial Port</label>
         <input type="text" id="node-input-params" placeholder="Serial Port">
+    </div>
+</script>
+
+<script type="text/x-red" data-template-name="hall-sensor-subscriber">
+    <div class="form-row">
+        <label for="node-input-timer"><i class="icon-tag"></i> Timer</label>
+        <input type="text" id="node-input-timer" placeholder="Timer">
+    </div>
+</script>
+
+<script type="text/x-red" data-template-name="temperature-humidity-subscriber">
+    <div class="form-row">
+        <label for="node-input-timer"><i class="icon-tag"></i> Timer</label>
+        <input type="text" id="node-input-timer" placeholder="Timer">
+    </div>
+</script>
+
+<script type="text/x-red" data-template-name="accelerometer-subscriber">
+    <div class="form-row">
+        <label for="node-input-timer"><i class="icon-tag"></i> Timer</label>
+        <input type="text" id="node-input-timer" placeholder="Timer">
     </div>
 </script>
 
