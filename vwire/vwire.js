@@ -18,7 +18,7 @@ module.exports = function(RED) {
     const SerialPort = require('serialport');
     const parsers = SerialPort.parsers;
 
-    const CMD_SEND_INTERVAL = 100; // 100 msec interval at minimum
+    const CMD_SEND_INTERVAL = 20; // 20 msec interval at minimum
 
     var port = null;
     var transactions = {};
@@ -39,7 +39,7 @@ module.exports = function(RED) {
 
     function cleanUp() {
         var cmdList = ['STP', 'CSC'];
-        sendCommands(null, cmdList, null, 0, port);
+        sendCommands(null, cmdList, null, 0);
         transactions = {};
         schedule = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
         subscriptions.length = 0;
@@ -129,7 +129,7 @@ module.exports = function(RED) {
                 var cmdList = ['STP', 'CSC'].concat(subscriptions);
                 //console.log(cmdList);
                 startSenderLoop(port);
-                sendCommands(null, cmdList, null, 0, port);
+                sendCommands(null, cmdList, null, 0);
             });
             port.on('error', function(data) {
                 port = null;
@@ -379,7 +379,7 @@ module.exports = function(RED) {
                 } else {
                     payload = cmd;
                 }
-                sendCommands(node, [].concat(cmdList), payload, index, null);
+                sendCommands(node, [].concat(cmdList), payload, index);
             });
             node.on('close', function(removed, done) {
                 cleanUp();
@@ -418,7 +418,7 @@ module.exports = function(RED) {
             var subscription = ['POS:'+pos.toString(), 'WSC:'+deviceId, 'STA'];
             if (port.isOpen) {
                 console.log('port is open');
-                sendCommands(null, subscription, null, 0, port);
+                sendCommands(null, subscription, null, 0);
             } else {
                 console.log('port is still not open');
                 subscriptions = subscriptions.concat(subscription);
