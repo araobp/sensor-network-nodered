@@ -35,7 +35,7 @@ The sensor network protocol supports plug&play, and "device-map" node in the Nod
 
 ## Sample flows
 
-### Feedback loop
+### Synchronous operations
 
 ![nodered](./doc/flow.png)
 
