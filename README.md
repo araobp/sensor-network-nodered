@@ -37,7 +37,7 @@ The following is a sample flow:
 
 ![nodered](./doc/flow.png)
 
-And a picture of the (physical) lcd showing "Hello World!":
+And a picture of the (physical) lcd showing current temperature:
 
 ![lcd](./doc/lcd.jpg)
 
