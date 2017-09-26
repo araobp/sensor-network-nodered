@@ -38,6 +38,8 @@ module.exports = function(RED) {
     var subscriptions = [];
 
     function cleanUp() {
+        var cmdList = ['STP', 'CSC'];
+        sendCommands(null, cmdList, null, 0, port);
         transactions = {};
         schedule = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
         subscriptions.length = 0;
@@ -287,6 +289,7 @@ module.exports = function(RED) {
     function VwireStatus(config) {
         RED.nodes.createNode(this, config);
         var node = this;
+        var port = getPort();
         statusIndicators.push(node);
         updatePortStatus(null);
         node.on('close', function(removed, done) {
