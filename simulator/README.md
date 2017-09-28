@@ -20,4 +20,6 @@ Refer to the following links for mosquitto and browserMqtt.js:
 
 ## Sample index.html as a device simulator
 
+[sample](./index.html)
+
 
