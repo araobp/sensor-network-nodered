@@ -132,6 +132,42 @@
 </script>
 
 <script type="text/javascript">
+    RED.nodes.registerType('position-detector-subscriber-1', {
+        category: 'sensor network',
+        color: "#3FADB5",
+        defaults: {
+            name: {value:""},
+            timer: {value:5, required:true, validate:RED.validators.number()}
+        },
+        inputs:0,
+        outputs:1,
+        icon: "serial.png",
+        align: 'right',
+        label: function() {
+            return this.name||"position detector #1";
+        }
+    });
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('position-detector-subscriber-2', {
+        category: 'sensor network',
+        color: "#3FADB5",
+        defaults: {
+            name: {value:""},
+            timer: {value:5, required:true, validate:RED.validators.number()}
+        },
+        inputs:0,
+        outputs:1,
+        icon: "serial.png",
+        align: 'right',
+        label: function() {
+            return this.name||"position detector #2";
+        }
+    });
+</script>
+
+<script type="text/javascript">
     RED.nodes.registerType('device-map', {
         category: 'sensor network',
         color: "#3FADB5",
@@ -386,6 +422,20 @@
 </script>
 
 <script type="text/x-red" data-template-name="accelerometer-subscriber">
+    <div class="form-row">
+        <label for="node-input-timer"><i class="icon-tag"></i> Timer</label>
+        <input type="text" id="node-input-timer" placeholder="Timer">
+    </div>
+</script>
+
+<script type="text/x-red" data-template-name="position-detector-subscriber-1">
+    <div class="form-row">
+        <label for="node-input-timer"><i class="icon-tag"></i> Timer</label>
+        <input type="text" id="node-input-timer" placeholder="Timer">
+    </div>
+</script>
+
+<script type="text/x-red" data-template-name="position-detector-subscriber-2">
     <div class="form-row">
         <label for="node-input-timer"><i class="icon-tag"></i> Timer</label>
         <input type="text" id="node-input-timer" placeholder="Timer">

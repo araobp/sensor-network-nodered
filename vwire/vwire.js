@@ -447,6 +447,8 @@ module.exports = function(RED) {
     RED.nodes.registerType("hall-sensor-subscriber", vwireSubscriberMaker(17));
     RED.nodes.registerType("accelerometer-subscriber", vwireSubscriberMaker(19));
     RED.nodes.registerType("temperature-humidity-subscriber", vwireSubscriberMaker(20));
+    RED.nodes.registerType("position-detector-subscriber-1", vwireSubscriberMaker(21));
+    RED.nodes.registerType("position-detector-subscriber-2", vwireSubscriberMaker(22));
     // The following nodes require ParserEnabled = false
     RED.nodes.registerType("door-status", vwireMaker("07", false, null));
     RED.nodes.registerType("door-unlock", vwireMaker("150", false, null));
