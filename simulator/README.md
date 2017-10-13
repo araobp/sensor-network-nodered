@@ -22,4 +22,17 @@ Refer to the following links for mosquitto and browserMqtt.js:
 
 [sample](./index.html)
 
+## Working with one-liner HTTP server
+
+Assuming that mosquitto is running on RasPi and all the files above are also on RasPi, use one-liner HTTP server to use the simulator on another PC.
+
+Installation
+```
+$ npm install -g http-server
+```
+
+Usage
+```
+$ http-server
+```
 

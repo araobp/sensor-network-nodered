@@ -14,7 +14,8 @@
       <script>
         var appModule = angular.module("app", []);
         appModule.controller("controller", ['$scope', function($scope) {
-          var client = mqtt.connect('ws://localhost:11883');
+          var serverIp = location.host.split(':')[0];
+          var client = mqtt.connect('ws://' + serverIp + ':11883');
           client.subscribe("test");
           $scope.message = '...';
 

@@ -43,6 +43,7 @@ module.exports = function(RED) {
         transactions = {};
         schedule = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
         subscriptions.length = 0;
+        statusIndicators.length = 0;
         sendQueue.length = 0;
     }
 
