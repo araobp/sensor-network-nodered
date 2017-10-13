@@ -150,6 +150,9 @@ Device B       |                |           mwire node 2                :
 
 ```
 
+Sample flow with mwire nodes:
+![elevator_contorl](./doc/elevator_control.png)
+
 ### TODO: BLE interface
 
 A priate BLE GATT service is to be provided.
