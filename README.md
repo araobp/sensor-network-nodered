@@ -153,30 +153,16 @@ Device B       |                |           mwire node 2                :
 Sample flow with mwire nodes:
 ![elevator_contorl](./doc/elevator_control.png)
 
-### TODO: BLE interface
+### BLE interface
 
-A priate BLE GATT service is to be provided.
-
-I am developing a serial communication service between Microchip's RN4020 and Node-RED/Android:
+I have developed a BLE interface for PIC MCU running at 5V.
 
 ![RN4020](./doc/ble.png)
 
 ![Schematic](./doc/ble.jpg)
 
 ```
-[Scheduler]--UART--[RN4020] - - BLE - - [Node-RED/Android]
-
-      Service "Sensor Network"
-      +---------------------------+
-      | Characteristics           |
-      | +-----------------------+ |
-<-WV--- |                       | <- Write -
-      | +-----------------------+ |
-      | Characteristics           |
-      | +-----------------------+ |
--SHU--> |                       | - Read/Notify ->
-      | +-----------------------+ |
-      +---------------------------+
+[I2C backplane master(scheduler)]--UART--[RN4020] <- - - BLE - - -> [RN4020]--UART/USB--[Node-RED/Android]
 ```
 
 Refer to [the user's guide](http://ww1.microchip.com/downloads/en/DeviceDoc/70005191B.pdf#search=%27RN4020%27).
