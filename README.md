@@ -1,6 +1,6 @@
 # sensor-network-nodered
 
-![vwire](./doc/vwire.png)
+![title](./doc/title.png)
 
 ## Background and motivation
 
@@ -119,6 +119,10 @@ I have just made [a minimal implementation](./vwire):
 Limitations:
 - Supports only one serial port.
 - Cannot perform parallel operations of a same command.
+
+## Device simulators
+
+I have also developed device simulators based on HTML5 and AngularJS => [simulator](./simulator)
 
 ### TODO: BLE interface
 
