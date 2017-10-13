@@ -53,7 +53,7 @@ And a picture of the (physical) lcd showing current temperature:
 
   <--- virtual wire (vwire) --------------------->                Node-RED flow
                                                                         |
-Sensor A      MCU          vWire common     vWire node 1                |
+Sensor A      MCU          vwire common     vwire node 1                |
    |           |                |    req1        |                      |
    |           |    req1        |<---------------|                      | in
    |           |<----uart-------|                |                      V
@@ -62,7 +62,7 @@ Sensor A      MCU          vWire common     vWire node 1                |
    |           |-----uart------>|    res1        |                      |
    |           |                |--------------->|                      | out
                |                |                                       :
-Sensor B       |                |           vWire node 2                :
+Sensor B       |                |           vwire node 2                :
    |           |                |                |                      |
    |           |                |    req2        |                      |
    |           |    req2        |<---------------|                      | in
@@ -123,6 +123,32 @@ Limitations:
 ## Device simulators
 
 I have also developed device simulators based on HTML5 and AngularJS => [simulator](./simulator)
+
+The simulators can be controlled by [mwire](./mwire) node:
+
+```
+  <--- virtual wire (vwire) --------------------->                Node-RED flow
+                                                                        |
+Device A     Chrome          mwire common     mwire node 1                |
+   |           |                |    req1        |                      |
+   |           |    req1        |<---------------|                      | in
+   |           |<----mqtt-------|                |                      V
+   |<---JS-----|                |                |               [mwire node 1]
+   |----JS---->|    res1        |                |                      |
+   |           |-----mqtt------>|    res1        |                      |
+   |           |                |--------------->|                      | out
+               |                |                                       :
+Device B       |                |           mwire node 2                :
+   |           |                |                |                      |
+   |           |                |    req2        |                      |
+   |           |    req2        |<---------------|                      | in
+   |           |<----mqtt-------|                |                      V
+   |<---JS-----|                |                |               [mwire node 2]
+   |----JS---->|    res2        |                |                      |
+   |           |-----mqtt------>|    res2        |                      |
+   |           |                |--------------->|                      V out
+
+```
 
 ### TODO: BLE interface
 
