@@ -1,0 +1,42 @@
+<html ng-app="app">
+  <head>
+    <meta charset="utf-8">
+    <title>LCD</title>
+    <link rel="stylesheet" type="text/css" href="lcd.css">
+    <script src="./browserMqtt.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+  </head>
+  <body ng-controller="controller">
+    <p ng-bind="message"></p>
+    <script>
+
+      function lcd($scope, command) {
+        var command = JSON.parse(command);
+        var cmd = command.cmd;
+        var message = command.args;
+        if (cmd == 'display') {
+            $scope.message = message;
+        } else if (cmd == 'clear') {
+            $scope.message = '';
+        }
+        $scope.$apply();
+      }
+
+      var appModule = angular.module("app", []);
+      appModule.controller("controller", ['$scope', function($scope) {
+        var serverIp = location.host.split(':')[0]; 
+        var client = mqtt.connect('ws://' + serverIp + ':11883');
+        client.subscribe("lcd-rx");
+
+        client.on("message", function (topic, payload) {
+          if (topic = "lcd-rx") { 
+            lcd($scope, payload);
+          }
+        })
+
+        client.publish("lcd-rx", JSON.stringify({cmd: 'display', args: 'Hello World!'}));
+      }]);
+    </script>
+
+  </body>
+</html>
