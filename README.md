@@ -118,6 +118,10 @@ Limitations:
 - Supports only one serial port.
 - Cannot perform parallel operations of a same command.
 
+## Device simulators
+
+I have also developed device simulators based on HTML5 and AngularJS => [simulator](./simulator)
+
 ### TODO: BLE interface
 
 A priate BLE GATT service is to be provided.
