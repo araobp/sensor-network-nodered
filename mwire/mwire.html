@@ -1,0 +1,98 @@
+<script type="text/javascript">
+    RED.nodes.registerType('mwire-config',{
+        category: 'config',
+        defaults: {
+            server: {value:"localhost:1883", required:true}
+        },
+        label: function() {
+            return this.server;
+        }
+    });
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('mwire-status', {
+        category: 'mqtt wire',
+        color: "#E6E0F8",
+        defaults: {
+            name: {value:""},
+            params: {value:"", type:"mwire-config"}
+        },
+        inputs:0,
+        outputs:0,
+        icon: "bridge.png",
+        label: function() {
+            return this.name||"mwire status";
+        }
+    });
+</script>
+
+
+<script type="text/javascript">
+    RED.nodes.registerType('mwire', {
+        category: 'mqtt wire',
+        color: "#E6E0F8",
+        defaults: {
+          name: {value:""},
+          device: {value:"", required:true},
+          command: {value:"", required:true},
+          args: {value:null},
+          noack: {value:false}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "bridge.png",
+        label: function() {
+          var cmd;
+          if (this.args) {
+            cmd = this.command + ':' + this.args;
+          } else {
+            cmd = this.command;
+          }
+          return cmd + "=>" + this.device;
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="mwire-config">
+    <div class="form-row">
+        <label for="node-config-input-server"><i class="icon-tag"></i> Server</label>
+        <input type="text" id="node-config-input-server" placeholder="Server">
+    </div>
+</script>
+
+<script type="text/x-red" data-template-name="mwire-status">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row"> <label for="node-input-params"><i class="icon-tag"></i> MQTT</label>
+        <input type="text" id="node-input-params" placeholder="MQTT">
+    </div>
+</script>
+
+<script type="text/x-red" data-template-name="mwire">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-device"><i class="icon-tag"></i> Device</label>
+        <input type="text" id="node-input-device" placeholder="Device">
+    </div>
+    <div class="form-row">
+        <label for="node-input-command"><i class="icon-tag"></i> Command</label>
+        <input type="text" id="node-input-command" placeholder="Command">
+    </div>
+    <div class="form-row">
+        <label for="node-input-args"><i class="icon-tag"></i> Args</label>
+        <input type="text" id="node-input-args" placeholder="Args">
+    </div>
+    <div class="form-row"> <label for="node-input-noack"><i class="icon-tag"></i> No ack</label>
+        <input type="checkbox" id="node-input-noack" placeholder="No ack">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="mwire">
+    <p>A node to communicate with the mqtt network.</p>
+</script>

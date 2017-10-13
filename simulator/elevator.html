@@ -1,0 +1,171 @@
+<html ng-app="app">
+  <head>
+    <meta charset="utf-8">
+    <title>Elevator</title>
+    <link rel="stylesheet" type="text/css" href="elevator.css">
+    <script src="./browserMqtt.js"></script>
+    <script src="./angular.min.js"></script>
+  </head>
+  <body ng-controller="controller">
+    <div id ="left-fixed">
+    </div>
+    <div id="inner">
+      <div id="top">
+        <div id="this_floor">
+          6
+        </div>
+        <div id="floors">
+          <div id="f0" class="floor">B1</div>
+          <div id="f1" class="floor">1</div>
+          <div id="f2" class="floor">2</div>
+          <div id="f3" class="floor">3</div>
+          <div id="f4" class="floor">4</div>
+          <div id="f5" class="floor">5</div>
+          <div id="f6" class="floor">6</div>
+          <div id="f7" class="floor">7</div>
+          <div id="f8" class="floor">8</div>
+          <div id="f9" class="floor">9</div>
+          <div id="f10" class="floor">10</div>
+          <div id="f11" class="floor">R</div>
+        </div>
+      </div>
+      <div id="bottom">
+        <div id ="left-door" ng-style="{'width': width_side}">
+        </div>
+        <div id ="center-space" ng-style="{'width': width_center}">
+        </div>
+        <div id ="right-door" ng-style="{'width': width_side}">
+        </div>
+      </div>
+    </div>
+    <div id ="right-fixed">
+      <div id="buttons">
+        <div class="button" ng-style="{'background-color': color_up}">&#9650;</div>
+        <div class="button" ng-style="{'background-color': color_down}">&#9660;</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+
+      const Interval = 2000; 
+      const TX = 'elevator-tx';
+      const RX = 'elevator-rx';
+
+      var from = 0;
+
+      function control($scope, command) {
+        cmd = command.cmd;
+        if (cmd == "open") {
+          setTimeout(function() {open($scope, 0)}, 50);
+        } else if (cmd == "close") {
+          setTimeout(function() {close($scope, 100)}, 50);
+        } else if (cmd == "down") {
+          $scope.color_down="yellow";
+          $scope.color_up="lightcyan";
+          $scope.$apply();
+          var resp = {cmd: 'down', response: 'ok'};
+          $scope.client.publish(TX, JSON.stringify(resp));
+        } else if (cmd == "up") {
+          $scope.color_down="lightcyan";
+          $scope.color_up="yellow";
+          $scope.$apply();
+          var resp = {cmd: 'up', response: 'ok'};
+          $scope.client.publish(TX, JSON.stringify(resp));
+        } else if (cmd == "clear") {
+          $scope.color_down="lightcyan";
+          $scope.color_up="lightcyan";
+          $scope.$apply();
+          var resp = {cmd: 'clear', response: 'ok'};
+          $scope.client.publish(TX, JSON.stringify(resp));
+        } else if (cmd == "go") {
+          var to = command.args; 
+          if (from < to) {
+            setTimeout(function() {ascend($scope, from, to)}, Interval);
+          } else if (from > to) { 
+            setTimeout(function() {descend($scope, from, to)}, Interval);
+          } else {
+            var resp = {cmd: 'go', response: 'ok'};
+            $scope.client.publish(TX, JSON.stringify(resp));
+          }
+        }
+      }
+
+      function open($scope, pos) {
+        pos = pos + 2.;
+        if (pos <= 100.0) {
+          $scope.width_center = pos.toString() + "%";
+          $scope.width_side = (50.-pos/2.).toString() + "%";
+          $scope.$apply();
+          setTimeout(function() {open($scope, pos)}, 50);
+        } else {
+          var resp = {cmd: 'open', response: 'ok'};
+          $scope.client.publish(TX, JSON.stringify(resp));
+        }
+      }
+
+      function close($scope, pos) {
+        pos = pos - 2.;
+        if (pos >= 0) {
+          $scope.width_center = pos.toString() + "%";
+          $scope.width_side = (50.-pos/2.).toString() + "%";
+          $scope.$apply();
+          setTimeout(function() {close($scope, pos)}, 50);
+        } else {
+          var resp = {cmd: 'close', response: 'ok'};
+          $scope.client.publish(TX, JSON.stringify(resp));
+        }
+      }
+
+      function ascend($scope, current, to) {
+        var elm;
+        if (current < to) {
+          elm = document.getElementById('f' + current.toString());
+          elm.style.backgroundColor = "lightcyan";
+          current = current + 1;
+          elm = document.getElementById('f' + current.toString());
+          elm.style.backgroundColor = "yellow";
+          setTimeout(function() {ascend($scope, current, to)}, Interval);
+        } else {
+          from = to;
+          var resp = {cmd: 'go', response: 'ok'};
+          $scope.client.publish(TX, JSON.stringify(resp));
+        }
+      }
+
+      function descend($scope, current, to) {
+        var elm;
+        if (current > to) {
+          elm = document.getElementById('f' + current.toString());
+          elm.style.backgroundColor = "lightcyan";
+          current = current - 1;
+          elm = document.getElementById('f' + current.toString());
+          elm.style.backgroundColor = "yellow";
+          setTimeout(function() {descend($scope, current, to)}, Interval);
+        } else {
+          from = to;
+          var resp = {cmd: 'go', response: 'ack'};
+          $scope.client.publish(TX, JSON.stringify(resp));
+        }
+      }
+          
+      var appModule = angular.module("app", []);
+      appModule.controller("controller", ['$scope', function($scope) {
+        var serverIp = location.host.split(':')[0];
+        var client = mqtt.connect('ws://' + serverIp + ':11883');
+
+        client.on("connect", function() {
+          client.subscribe(RX);
+          var resp = {cmd: 'go', args: 1};
+          client.publish(RX, JSON.stringify(resp));
+        });
+
+        client.on("message", function (topic, payload) {
+          payload = JSON.parse(payload);
+          $scope.client = client;
+          control($scope, payload);
+        });
+      }]);
+    </script>
+  </body>
+</html>

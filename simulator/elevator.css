@@ -1,0 +1,150 @@
+body {
+    background-color: darkgrey;
+    margin: 0px;
+    border: 0px;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+}
+
+html {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+#inner {
+    border-style: solid;
+    border-color: grey;
+    border-width: 2px;
+    background-color: skyblue;
+    width: 74%;
+}
+
+#top {
+    background-color: whitesmoke;
+    border-style: outset;
+    border-width: 1px;
+    width: 100%;
+    height: 12%;
+    position: relative;
+}
+
+#this_floor {
+    font-size: 3.0em;
+    text-align: center; 
+    color: black;
+    top: 10%;
+    left: 0;
+    right: 0;
+    margin: auto;
+    position: absolute;
+}
+
+#floors {
+    width: 60%;
+    height: 20%;
+    bottom: 8%;
+    left: 0;
+    right: 0;
+    margin: auto;
+    position: absolute;
+    display: flex;
+}
+
+.floor {
+    background-color: lightcyan;
+    width: 10%;
+    height: 100%;
+    border-style: outset;
+    border-color: darkseagreen;
+    border-width: 2px;
+    font-size: 1.2em;
+    text-align: center; 
+}
+
+#bottom {
+    width: 100%;
+    height: 88%;
+    overflow: hidden;
+    display: flex;
+}
+
+#left-fixed {
+    background-color: floralwhite;
+    border-style: outset;
+    border-color: grey; 
+    border-width: 2px;
+    width: 13%;
+    height: auto;
+}
+
+#left-door {
+    background-color: whitesmoke;
+    border-top-style: solid;
+    border-right-style: solid;
+    border-bottom-style: solid;
+    border-right-color: grey; 
+    border-top-color: grey; 
+    border-bottom-color: grey; 
+    border-width: 1px;
+    width: 50%;
+    height: auto;
+}
+
+#center-space {
+    background-color: grey;
+    width: 0%;
+    height: auto;
+}
+
+#right-door {
+    background-color: whitesmoke;
+    border-top-style: solid;
+    border-left-style: solid;
+    border-bottom-style: solid;
+    border-left-color: grey; 
+    border-top-color: grey; 
+    border-bottom-color: grey; 
+    border-width: 1px;
+    width: 50%;
+    height: auto;
+}
+
+#right-fixed {
+    background-color: floralwhite;
+    border-style: outset;
+    border-color: grey; 
+    border-width: 2px;
+    width: 13%;
+    height: auto;
+    position: relative;
+}
+
+#buttons {
+    width: 30%;
+    height: 5%;
+    bottom: 40%;
+    left: 30%;
+    margin: auto;
+    position: absolute;
+}
+
+.button {
+    background-color: lightcyan;
+    width: 100%;
+    height: 50%;
+    border-style: outset;
+    border-color: grey;
+    border-width: 2px;
+    font-size: 1.2em;
+    text-align: center; 
+}
+
+p {
+    font-size: 30px;
+    color: darkslategrey;
+}
