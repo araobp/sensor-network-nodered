@@ -162,7 +162,7 @@ I have developed a BLE interface for PIC MCU running at 5V.
 ![Schematic](./doc/ble.jpg)
 
 ```
-[I2C backplane master(scheduler)]--UART--[RN4020] <- - - BLE - - -> [RN4020]--UART/USB--[Node-RED/Android]
+[I2C backplane master(scheduler)]--UART--[RN4020] <- - - MLDP/BLE - - -> [RN4020]--UART/USB--[Node-RED/Android]
 ```
 
 Refer to [the user's guide](http://ww1.microchip.com/downloads/en/DeviceDoc/70005191B.pdf#search=%27RN4020%27).
