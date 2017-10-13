@@ -1,5 +1,7 @@
 # sensor-network-nodered
 
+![title](./doc/title.png)
+
 ## Background and motivation
 
 Generally speaking, the granurarity of nodes on Node-RED is fine-grained (KISS), and some of them are asynchronous (event-driven).
