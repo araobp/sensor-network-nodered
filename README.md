@@ -127,9 +127,9 @@ I have also developed device simulators based on HTML5 and AngularJS => [simulat
 The simulators can be controlled by [mwire](./mwire) node:
 
 ```
-  <--- virtual wire (vwire) --------------------->                Node-RED flow
+  <------ mqtt wire (mwire) --------------------->                Node-RED flow
                                                                         |
-Device A     Chrome          mwire common     mwire node 1                |
+Device A     Chrome          mwire common     mwire node 1              |
    |           |                |    req1        |                      |
    |           |    req1        |<---------------|                      | in
    |           |<----mqtt-------|                |                      V
