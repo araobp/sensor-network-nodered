@@ -57,7 +57,9 @@ module.exports = function(RED) {
                 payload = JSON.parse(payload);
                 var key = topic + ":" + payload.cmd;
                 if (key in transactions) {
-                    transactions[key].send({payload: payload});
+                    var node = transactions[key];
+                    node.status({});
+                    node.send({payload: payload});
                     delete transactions[key];
                 }
             });
@@ -110,10 +112,10 @@ module.exports = function(RED) {
         var command = config.command || null;
         var args = null;
         if (config.args) {
-            if (typeof(config.args) == "string") {
-                args = config.args;
-            } else {
+            try {
                 args = JSON.parse(config.args);
+            } catch(e) {
+                args = config.args;
             }
         }
         var noack = config.noack;
@@ -126,6 +128,7 @@ module.exports = function(RED) {
         }
         node.on('input', function(msg) {
             var cmd = null;
+            node.status({fill:"blue", shape:"dot"});
             if (command != null) {
                 cmd = {cmd: command, args: args};
             } else {
@@ -135,12 +138,14 @@ module.exports = function(RED) {
                 transactions[topicTx + ':' + cmd.cmd] = node;
                 client.publish(topicRx, JSON.stringify(cmd));
             } else {
+                node.status({});
                 client.publish(topicRx, JSON.stringify(cmd));
                 node.send({payload: null});
             }
             console.log(JSON.stringify(cmd));
         });
         node.on('close', function(removed, done) {
+            node.status({});
             cleanUp();
             done();
         });
