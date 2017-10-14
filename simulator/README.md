@@ -20,7 +20,7 @@ Refer to the following links for mosquitto and browserMqtt.js:
 
 ## Sample device simulators
 
-This elevator simulator can be controlled by [mwire](../mwire) node.
+These simulators can be controlled by [mwire](../mwire) node.
 
 ### Hello World
 
