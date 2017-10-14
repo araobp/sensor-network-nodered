@@ -2,39 +2,45 @@
   <head>
     <meta charset="utf-8">
     <title>LCD</title>
-    <link rel="stylesheet" type="text/css" href="lcd.css">
+    <link rel="stylesheet" type="text/css" href="display.css">
     <script src="./browserMqtt.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
   </head>
   <body ng-controller="controller">
-    <p ng-bind="message"></p>
+    <div id="inner" ng-style="{'background-image': image}">
+      <p ng-bind="message"></p>
+    </div>
     <script>
 
-      function lcd($scope, command) {
+      function display($scope, command) {
         var command = JSON.parse(command);
         var cmd = command.cmd;
-        var message = command.args;
+        var args = command.args;
         if (cmd == 'display') {
-            $scope.message = message;
+          $scope.message = args;
         } else if (cmd == 'clear') {
-            $scope.message = '';
+          $scope.message = '';
+        } else if (cmd == 'image') {
+          $scope.image = "url(./images/" + args + ")"; 
         }
         $scope.$apply();
+        $scope.client.publish("display-tx", JSON.stringify({"cmd": cmd, "response": "ok"}));
       }
 
       var appModule = angular.module("app", []);
       appModule.controller("controller", ['$scope', function($scope) {
         var serverIp = location.host.split(':')[0]; 
         var client = mqtt.connect('ws://' + serverIp + ':11883');
-        client.subscribe("lcd-rx");
+        client.subscribe("display-rx");
+        $scope.client = client;
 
         client.on("message", function (topic, payload) {
-          if (topic = "lcd-rx") { 
-            lcd($scope, payload);
+          if (topic = "display-rx") { 
+            display($scope, payload);
           }
         })
 
-        client.publish("lcd-rx", JSON.stringify({cmd: 'display', args: 'Hello World!'}));
+        client.publish("display-rx", JSON.stringify({cmd: 'display', args: 'Hello World!'}));
       }]);
     </script>
 

@@ -110,7 +110,11 @@ module.exports = function(RED) {
         var command = config.command || null;
         var args = null;
         if (config.args) {
-            args = JSON.parse(config.args);
+            if (typeof(config.args) == "string") {
+                args = config.args;
+            } else {
+                args = JSON.parse(config.args);
+            }
         }
         var noack = config.noack;
         var topicTx = deviceId + '-tx';
@@ -134,6 +138,7 @@ module.exports = function(RED) {
                 client.publish(topicRx, JSON.stringify(cmd));
                 node.send({payload: null});
             }
+            console.log(JSON.stringify(cmd));
         });
         node.on('close', function(removed, done) {
             cleanUp();
