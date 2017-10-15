@@ -1,6 +1,6 @@
 # Device simulator based on HTML5 and AngularJS
 
-Device simulators are useful for making MVP (Minimum Viable Product) at a minimum cost.
+Device simulators are useful for making MVP (Minimum Viable Product) at a minimum cost: a combination of real sensors/actuators, sensor/actuator simulators and demo slides/videos. Everything is orchestrated by a flow on Node-RED.
 
 ## Prerequisite
 
