@@ -1,5 +1,7 @@
 # Device simulator based on HTML5 and AngularJS
 
+Device simulators are useful for making MVP (Minimum Viable Product) at a minimum cost.
+
 ## Prerequisite
 
 - [mosquitto](https://mosquitto.org) is runnig somewhere, for example, on RasPi.
