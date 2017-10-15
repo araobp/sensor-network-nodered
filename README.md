@@ -8,7 +8,7 @@ Lately I have been creating miniature things that can be controlled by Node-RED 
 
 Generally speaking, the granurarity of nodes on Node-RED is fine-grained (KISS), and some of them are asynchronous (event-driven). However, I want coarse-grained and synchronous ones for rapid IoT prototyping.
 
-The goal of this project is to see if it is possible to create synchronous and coarse-grained nodes on Node-RED to control my miniature things in a sequence-control manner. Some of them use [this sensor network protocol](https://github.com/araobp/sensor-network).
+The goal of this project is to see if it is possible to create synchronous and coarse-grained nodes on Node-RED to control my miniature things in a sequence-control manner: Node-RED works as Programmable Logic Controller (PLC) for IoT prototype or IoT demo. Some of them utilize [this sensor network protocol](https://github.com/araobp/sensor-network) to control devices.
 
 I also develop [device simulators](./simulator) controlled by such synchrnous and coarse-grained nodes on Node-RED.
 
