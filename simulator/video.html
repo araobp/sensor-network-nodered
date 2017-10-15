@@ -1,0 +1,43 @@
+<html ng-app="app">
+  <head>
+    <meta charset="utf-8">
+    <title>Video</title>
+    <link rel="stylesheet" type="text/css" href="video.css">
+    <script src="./browserMqtt.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.6/angular.min.js"></script>
+  </head>
+  <body ng-controller="controller">
+    <div id="inner">
+      <video id="video" autoplay style="height: 100%; width: 100%;" ng-src="{{video}}">
+    </div>
+    <script>
+
+      var video = document.getElementById("video");
+
+      var appModule = angular.module("app", []);
+      appModule.controller("controller", ['$scope', function($scope) {
+        var serverIp = location.host.split(':')[0];
+        var client = mqtt.connect('ws://' + serverIp + ':11883');
+        client.subscribe("video-rx");
+        client.on("connect", function() {
+          video.addEventListener("ended", function(){
+            client.publish("video-tx", JSON.stringify({cmd: "play", response: "ok"}));
+              }, false);
+        });
+
+        client.on("message", function (topic, payload) {
+          var command = JSON.parse(payload);
+          if (command.cmd == "play") {
+            $scope.video = command.args;
+            $scope.$apply();
+            video.play();
+          }
+        })
+
+
+        client.publish("video-rx", JSON.stringify({cmd: "play"}));
+      }]);
+    </script>
+
+  </body>
+</html>
