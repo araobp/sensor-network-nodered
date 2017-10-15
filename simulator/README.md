@@ -50,6 +50,12 @@ Sample flow:
 
 ![display_control](../doc/display_control.png)
 
+### Video
+
+This is a simple video player based on HTML5 video element.
+
+[sample](./video.html)
+
 ## Working with one-liner HTTP server
 
 Assuming that mosquitto is running on RasPi and all the files above are also on RasPi, use one-liner HTTP server to use the simulator on another PC.
